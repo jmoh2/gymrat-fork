@@ -21,10 +21,4 @@ The files listed above are commented fairly extensively and organized with purpo
 -Salted and hashed password management
 -JWT tokens for secure authorization
 
-<<<<<<< HEAD
 Test of new Changes1
-
-Joanne - new changes
-=======
-Test of new Changes1
->>>>>>> 837c45297a47dfab53634b493430a6396c17c857
