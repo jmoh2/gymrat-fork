@@ -25,6 +25,11 @@ app.get('/', (req, res) => {
 app.get('/dashboard', (req, res) => {
     res.sendFile(__dirname + '/public/dashboard.html');
 });
+
+// Route to serve basepage.html
+app.get('/basepage', (req, res) => {
+    res.sendFile(__dirname + '/public/basepage.html');
+});
 //////////////////////////////////////
 //END ROUTES TO SERVE HTML FILES
 //////////////////////////////////////
