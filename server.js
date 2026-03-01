@@ -7,8 +7,6 @@ const bcrypt = require('bcryptjs');
 const app = express();
 const port = 3000;
 
-// This is a test to see if I (Kunal) can commit a change
-
 // Middleware to parse JSON bodies
 app.use(express.json());
 
