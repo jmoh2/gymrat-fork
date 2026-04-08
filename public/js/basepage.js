@@ -50,7 +50,24 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    async function totalMealCount() {
+        const token = localStorage.getItem("jwtToken");
+
+        try {
+            const res = await fetch('/api/meal-count', {
+                headers: {
+                    "Authorization": token
+                }
+            });
+            const data = await res.json();
+            document.getElementById('mealCount').textContent = data.total;
+        } catch (error) {
+            console.error('Error fetching meal count:', error);
+        }
+    }   
+
     totalWorkoutCount();
+    totalMealCount();
     // Fetch the user's name and display a welcome message based on username and span id welcomeMessage
     
 
