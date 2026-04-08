@@ -34,6 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
         welcomeHeading.textContent = `Welcome to GymRat, ${userName}!`;
     }
 
+    // Fetch and display total workout count
     async function totalWorkoutCount() {
         const token = localStorage.getItem("jwtToken");
 
@@ -50,6 +51,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // Fetch and display total meal count
     async function totalMealCount() {
         const token = localStorage.getItem("jwtToken");
 
@@ -66,8 +68,43 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }   
 
+    // Fetch and display Calories burned today
+    async function caloriesBurnedToday() {
+        const token = localStorage.getItem("jwtToken");
+
+        try {
+            const res = await fetch('/api/calories-burned-today', {
+                headers: {
+                    "Authorization": token
+                }
+            });
+            const data = await res.json();
+            document.getElementById('calorieSummary').textContent = data.total;
+        } catch (error) {
+            console.error('Error fetching calories burned today:', error);
+        }
+    }
+
+    // Fetch and display active days this week
+    async function activeDaysThisWeek() {
+        const token = localStorage.getItem("jwtToken");
+
+        try {
+            const res = await fetch('/api/active-days-this-week', {
+                headers: {
+                    "Authorization": token
+                }
+            });
+            const data = await res.json();
+            document.getElementById('activeDaysSummary').textContent = data.total;
+        } catch (error) {
+            console.error('Error fetching active days this week:', error);
+        }
+    }   
     totalWorkoutCount();
     totalMealCount();
+    caloriesBurnedToday();
+    activeDaysThisWeek();
     // Fetch the user's name and display a welcome message based on username and span id welcomeMessage
     
 

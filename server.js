@@ -452,6 +452,53 @@ app.get('/api/meal-count', authenticateToken, async (req, res) => {
     }
 });
 
+// Route: Get Calories Burned Today
+app.get('/api/calories-burned-today', authenticateToken, async (req, res) => {
+    try {
+        const connection = await createConnection();
+        const today = new Date().toISOString().split('T')[0];
+
+        const [result] = await connection.execute(
+            `SELECT SUM(calories_burned) AS total_calories
+             FROM workouts
+             WHERE user_id = (SELECT user_id FROM user WHERE email = ?)
+             AND workout_date = ?`,
+            [req.user.email, today]
+        );
+        await connection.end();
+
+        const caloriesBurned = result[0].total_calories || 0;
+        res.status(200).json({ total: caloriesBurned });
+    } catch (error) {
+        console.error('DB ERROR:', error);
+        res.status(500).json({ message: 'Error retrieving calories burned today.' });
+    }
+}); 
+
+// Route: Get Active Days This Week
+app.get('/api/active-days-this-week', authenticateToken, async (req, res) => {
+    try {
+        const connection = await createConnection();
+        const today = new Date();
+        const startOfWeek = new Date(today.setDate(today.getDate() - today.getDay())).toISOString().split('T')[0];
+        const endOfWeek = new Date(today.setDate(today.getDate() - today.getDay() + 6)).toISOString().split('T')[0];
+
+        const [result] = await connection.execute(
+            `SELECT COUNT(DISTINCT workout_date) AS active_days
+             FROM workouts
+             WHERE user_id = (SELECT user_id FROM user WHERE email = ?)
+             AND workout_date BETWEEN ? AND ?`,
+            [req.user.email, startOfWeek, endOfWeek]
+        );
+        await connection.end();
+
+        const activeDays = result[0].active_days || 0;
+        res.status(200).json({ total: activeDays });
+    } catch (error) {
+        console.error('DB ERROR:', error);
+        res.status(500).json({ message: 'Error retrieving active days this week.' });
+    }
+});
 // Route: Get Suggested Workout based on user's fitness goal
 app.get('/api/suggested-workout', authenticateToken, async (req, res) => {
     try {
