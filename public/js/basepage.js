@@ -122,55 +122,83 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Calculate BMR using lbs and inches
     function calculateBMR(profile) {
-        if (!profile) {
-            return 2000;
-        }
-
-        const weightLbs = Number(profile.weight) || 120;
-        const heightInches = Number(profile.height) || 65;
+        const weight = Number(profile.weight) || 120; // lbs
+        const height = Number(profile.height) || 65;  // inches
         const age = Number(profile.age) || 20;
         const gender = (profile.gender || "female").toLowerCase();
-
-        const weightKg = weightLbs * 0.453592;
-        const heightCm = heightInches * 2.54;
 
         let bmr = 0;
 
         if (gender === "male") {
-            bmr = (10 * weightKg) + (6.25 * heightCm) - (5 * age) + 5;
+            bmr = 66 + (6.23 * weight) + (12.7 * height) - (6.8 * age);
         } else {
-            bmr = (10 * weightKg) + (6.25 * heightCm) - (5 * age) - 161;
+            bmr = 655 + (4.35 * weight) + (4.7 * height) - (4.7 * age);
         }
 
         return Math.round(bmr);
     }
 
-    // Get calorie goal based on profile goal
-    async function getTargetCalories() {
-        try {
-            const profile = await DataModel.getUserProfile();
-            const bmr = calculateBMR(profile);
-            const goal = profile.fitness_goal;
+async function getTargetCalories() {
+    try {
+        const profile = await DataModel.getUserProfile();
+        console.log("PROFILE FROM BASEPAGE:", profile);
 
-            if (goal === "lose_weight" || goal === "Lose Weight") {
-                return bmr - 300;
-            }
+        const weightLbs = Number(profile.weight) || 120;
+        const heightInches = Number(profile.height) || 65;
+        const age = Number(profile.age) || 20;
 
-            if (goal === "gain_muscle" || goal === "Gain Muscle") {
-                return bmr + 300;
-            }
+        const gender = (profile.gender || "").toLowerCase().trim();
+        const goal = (profile.fitness_goal || "").toLowerCase().trim();
+        const exerciseLevel = (profile.exercise_level || "").toLowerCase().trim();
 
-            return bmr;
-        } catch (error) {
-            console.error('Error fetching target calories:', error);
-            return 2000;
+        let bmr = 0;
+
+        if (gender === "male") {
+            bmr = 66 + (6.23 * weightLbs) + (12.7 * heightInches) - (6.8 * age);
+        } else {
+            bmr = 655 + (4.35 * weightLbs) + (4.7 * heightInches) - (4.7 * age);
         }
+
+        let activityMultiplier = 1.2;
+
+        if (exerciseLevel === "low") {
+            activityMultiplier = 1.2;
+        } else if (exerciseLevel === "moderate") {
+            activityMultiplier = 1.375;
+        } else if (exerciseLevel === "high") {
+            activityMultiplier = 1.55;
+        }
+
+        const maintenanceCalories = Math.round(bmr * activityMultiplier);
+
+        if (goal === "lose weight" || goal === "lose_weight") {
+            return maintenanceCalories - 300;
+        }
+
+        if (goal === "build muscle" || goal === "build_muscle") {
+            return maintenanceCalories + 250;
+        }
+
+        if (goal === "gain weight" || goal === "gain_weight") {
+            return maintenanceCalories + 300;
+        }
+
+        if (goal === "maintain weight" || goal === "maintain_weight") {
+            return maintenanceCalories;
+        }
+
+        return maintenanceCalories;
+    } catch (error) {
+        console.error("Error fetching target calories:", error);
+        return 2000;
     }
+}
 
     // Update Progress Toward Goal and Daily Net Calories
     async function updateGoalProgress() {
         try {
             const consumed = await caloriesConsumedToday();
+            const goal = await getTargetCalories();
 
             const token = localStorage.getItem("jwtToken");
             let burned = 0;
@@ -186,8 +214,6 @@ document.addEventListener('DOMContentLoaded', () => {
             } catch (error) {
                 console.error('Error fetching calories burned for goal progress:', error);
             }
-
-            const goal = await getTargetCalories();
 
             const netCalories = consumed - burned;
             const percent = Math.min((consumed / goal) * 100, 100);
