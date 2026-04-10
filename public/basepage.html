@@ -49,11 +49,30 @@
         </div>
     </div>
 
-    <div class="dashboard">
-        <div class="progress-graph">
-            <h1>Progress Towards Goals</h1>
-        </div>
+    <div class="progress-graph">
+  <h1>Goal Progress</h1>
+
+  <div class="goal-dashboard">
+    <div class="goal-dashboard-item">
+      <h3>Progress Toward Goal</h3>
+
+      <div class="goal-progress-bar">
+        <div id="progressBar" class="goal-progress-fill"></div>
+      </div>
+
+      <p id="goalPercentText" class="goal-main-text">0% of goal</p>
+      <p id="goalCaloriesText" class="goal-sub-text">0 / 2000 calories</p>
+      <p id="goalRemainingText" class="goal-sub-text">0 calories remaining</p>
     </div>
+
+    <div class="goal-dashboard-item">
+      <h3>Daily Net Calories</h3>
+      <p id="netCaloriesValue" class="goal-main-text">0 cal</p>
+      <p id="consumedText" class="goal-sub-text">Consumed: 0</p>
+      <p id="burnedText" class="goal-sub-text">Burned: 0</p>
+    </div>
+  </div>
+</div>
 
 
     <script src="/js/basepage.js"></script>
