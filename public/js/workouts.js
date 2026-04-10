@@ -576,3 +576,76 @@ document.addEventListener("DOMContentLoaded", () => {
     loadSuggestedWorkout();
     refreshWorkoutTables();
 });
+
+
+// testing visual rep of table
+function getWorkoutData() {
+  const rows = document.querySelectorAll("#workoutTable tbody tr");
+
+  let labels = [];
+  let data = [];
+
+  rows.forEach(row => {
+    const cells = row.querySelectorAll("td");
+    
+    labels.push(cells[0].innerText); // e.g., date
+    data.push(parseFloat(cells[4].innerText)); // e.g., weight/reps
+  });
+
+  return { labels, data };
+}
+let chart;
+
+function getWorkoutData() {
+  const rows = document.querySelectorAll("#workoutTable tbody tr");
+
+  let labels = [];
+  let data = [];
+
+  rows.forEach(row => {
+    const cells = row.querySelectorAll("td");
+
+    labels.push(cells[0].innerText); // Date
+    data.push(parseFloat(cells[5].innerText)); // Calories
+  });
+
+  return { labels, data };
+}
+
+function renderChart(type) {
+  const canvas = document.getElementById("workoutChart");
+  if (!canvas) return;
+
+  const ctx = canvas.getContext("2d");
+  const workoutData = getWorkoutData();
+
+  if (chart) chart.destroy();
+
+  chart = new Chart(ctx, {
+    type: type,
+    data: {
+      labels: workoutData.labels,
+      datasets: [{
+        label: "Calories Burned",
+        data: workoutData.data,
+        borderWidth: 2
+      }]
+    },
+    options: {
+    responsive: true,
+    maintainAspectRatio: false
+    }
+  });
+    setTimeout(() => {
+    chart.resize();
+  }, 50);
+}
+
+window.switchChart = function(type) {
+  console.log("switching to:", type);
+  renderChart(type);
+};
+
+window.addEventListener("load", () => {
+  renderChart("bar");
+});

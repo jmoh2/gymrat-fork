@@ -127,9 +127,16 @@ body {
 }
 
 .container {
+    background: var(--white);
+    padding: 24px;
+    border-radius: 12px;
+    box-shadow: var(--shadow-md);
+    margin-bottom: 24px;
+    max-width: 1000px;
+
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 16px;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 12px;
 }
 
 label {
@@ -179,8 +186,23 @@ select {
     flex-direction: column;
 }
 
+.quarter {
+    grid-column: span 3;
+}
+
+input, select {
+    width: 100%;
+    padding: 12px;
+    font-size: 14px;
+}
+
+input {
+    min-width: 0;
+}
+
 .favorite-toggle {
-    justify-content: flex-end;
+    justify-content: flex-start;
+    grid-column: 1 / -1;
 }
 
 .checkbox-row {
@@ -191,13 +213,29 @@ select {
 }
 
 .checkbox-row input[type="checkbox"] {
-    width: auto;
+    width: 40px;
+    height: 18px;
     transform: scale(1.2);
 }
 
 .checkbox-row span {
     font-size: 13px;
     color: var(--text-dark);
+}
+
+.inputsubmit-button {
+    display: inline-block;
+    padding: 10px 20px;
+    background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+    color: var(--white);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    font-family: inherit;
 }
 
 .form-group label {
@@ -449,4 +487,71 @@ img {
     .button {
         width: 100%;
     }
+}
+
+
+/* testing visual rep of table */
+.workout-dashboard {
+    display: flex;
+    gap: 20px;
+    align-items: stretch;
+}
+
+.table-section {
+    flex: 2;
+    min-width: 0;
+}
+
+.chart-card {
+    flex: 1;
+    background: var(--white);
+    padding: 24px;
+    border-radius: 12px;
+    box-shadow: var(--shadow-md);
+    border-left: 4px solid var(--primary-blue);
+    height: 400px;
+    display:flex;
+    flex-direction: column;
+}
+
+.chart-card canvas {
+    flex: 1;
+    min-height: 0;
+}
+
+#workoutChart {
+    flex: 1;
+    width: 100% !important;
+    height: 100% !important;
+}
+
+.chart-button {
+    display: inline-block;
+    padding: 7px 15px;
+    background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+    color: var(--white);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    font-family: inherit;
+}
+
+.chart-controls {
+    margin-bottom: 10px;
+}
+
+.chart-area {
+    flex: 1;
+    position: relative;
+}
+
+.chart-area canvas {
+    position: absolute;
+    inset: 0;
+    width: 100% !important;
+    height: 100% !important;
 }

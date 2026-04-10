@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Workout Input and Tracker</title>
     <link rel="stylesheet" href="css/workout.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <div class="header-bar">
@@ -30,16 +31,18 @@
     <span id="currentGoal"></span>
 </div>
 
+
+<!-- workout inputs -->
     <div class="container">
     <h3>New Workout Input</h3>
 
-    <div class="form-group">
+    <div class="form-group quarter">
     <label for="workoutName">Workout Name:</label>
     <input type="text" id="workoutName" name="workoutName">
     </div>
 
     <!-- Dropdown menu with broad workout options: Cardio, Strength Training, HIIT, Flexibility/Yoga, Sports, Core, Recovery, and Other -->
-  <div class="form-group">
+  <div class="form-group quarter">
     <label for="workoutType">Workout Type:</label>
     <select id="workoutType" name="workoutType">
         <option value="cardio">Cardio</option>
@@ -54,7 +57,7 @@
     </select>
 </div>
 
-<div class="form-group">
+<div class="form-group quarter">
     <label for="workoutIntensity">Intensity:</label>
     <select id="workoutIntensity" name="workoutIntensity">
         <option value="low">Low</option>
@@ -63,17 +66,17 @@
     </select>
 </div>
 
-<div class="form-group">
+<div class="form-group quarter">
     <label for="caloriesBurned">Calories Burned:</label>
     <input type="number" id="caloriesBurned" name="caloriesBurned" min="0"> 
 </div>
 
-<div class="form-group">
+<div class="form-group quarter">
     <label for="duration">Duration (minutes):</label>
     <input type="number" id="duration" name="duration" min="1">
 </div>
 
-<div class="form-group">
+<div class="form-group quarter">
     <label for="notes">Notes:</label>
     <input type="text" id="notes" name="notes">
 </div>
@@ -91,11 +94,45 @@
     </div>
 </div>
     
-    <button id="submit" class="button">Submit</button>
+    <button id="submit" class="inputsubmit-button">Submit</button>
 
 </div>
 
-    <br><br>
+<!-- favorite workouts table -->
+    <div class="card">
+        <h3>Favorite Workouts</h3>
+
+        <table id="favoriteWorkoutTable">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th>Intensity</th>
+                    <th>Duration (mins)</th>
+                    <th>Calories Burned</th>
+                    <th>Notes</th>
+                    <th>Use Favorite</th>
+                    <th>Remove Favorite</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+
+     <!-- CHART CARD -->
+<div class="chart-card">
+    <div class="chart-controls">
+            <button class="chart-button" onclick="switchChart('bar')">Bar</button>
+            <button class="chart-button" onclick="switchChart('line')">Line</button>
+        </div>
+    <div class="chart-area">
+        <canvas id="workoutChart"></canvas>
+     </div>
+</div>
+
+
+<br><br>
 
     <!-- Filter for Table -->
     <div class="filter-container">
@@ -176,29 +213,9 @@
     </div>
 
 </div>
-    
+
+
 <!-- Actual Table for Past Workouts -->
-
-    <div class="card">
-        <h3>Favorite Workouts</h3>
-
-        <table id="favoriteWorkoutTable">
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Type</th>
-                    <th>Intensity</th>
-                    <th>Duration (mins)</th>
-                    <th>Calories Burned</th>
-                    <th>Notes</th>
-                    <th>Use Favorite</th>
-                    <th>Remove Favorite</th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
-    </div>
-
     <div class="card">
         <h3>Past Workouts</h3>
 
