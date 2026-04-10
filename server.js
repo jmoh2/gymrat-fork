@@ -48,6 +48,15 @@ async function createConnection() {
     });
 }
 
+function getLocalDateForSql() {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+
+    return `${year}-${month}-${day}`;
+}
+
 // **Authorization Middleware: Verify JWT Token and Check User in Database**
 async function authenticateToken(req, res, next) {
     const token = req.headers['authorization'];
@@ -206,9 +215,17 @@ app.post('/api/login', async (req, res) => {
 
 // Route: Send meal data (Protected Route)
 app.post('/api/meals', authenticateToken, async (req, res) => {
-    const { date, type, description, calories, protein, fats, carbs } = req.body;
+    const { date, type, description, calories, protein, fats, carbs, favorite } = req.body;
 
-    if (!date || !type || !description || !calories || !protein || !fats || !carbs) {
+    if (
+        !date ||
+        !type ||
+        !description ||
+        calories === undefined ||
+        protein === undefined ||
+        fats === undefined ||
+        carbs === undefined
+    ) {
         return res.status(400).json({ message: 'All meal fields are required.' });
     }
 
@@ -226,11 +243,10 @@ app.post('/api/meals', authenticateToken, async (req, res) => {
 
         await connection.execute(
             `INSERT INTO meals
-             (user_id, meal_date, meal_type, description, calories, protein, fats, carbs)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-            [userId, date, type, description, calories, protein, fats, carbs]
+             (user_id, meal_date, meal_type, description, calories, protein, fats, carbs, favorite_flag)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            [userId, date, type, description, calories, protein, fats, carbs, favorite ? 1 : 0]
         );
-        await connection.end();
         res.status(201).json({ message: 'Meal data saved successfully!' });
     } catch (error) {
         console.error('DB ERROR:', error);
@@ -244,9 +260,16 @@ app.post('/api/meals', authenticateToken, async (req, res) => {
 
 // Route: Send Workout Data (Protected Route)
 app.post('/api/workouts', authenticateToken, async (req, res) => {
-     const { workoutName, workoutType, workoutIntensity, duration, notes, date, caloriesBurned } = req.body;
+     const { workoutName, workoutType, workoutIntensity, duration, notes, date, caloriesBurned, favorite } = req.body;
 
-    if (!workoutName || !workoutType || !workoutIntensity || !duration || !date || !caloriesBurned) {
+    if (
+        !workoutName ||
+        !workoutType ||
+        !workoutIntensity ||
+        !duration ||
+        !date ||
+        caloriesBurned === undefined
+    ) {
         return res.status(400).json({ message: 'All workout fields except notes are required.' });
     }
 
@@ -272,9 +295,9 @@ app.post('/api/workouts', authenticateToken, async (req, res) => {
 
         const [insertResult] = await connection.execute(
             `INSERT INTO workouts
-             (user_id, workout_name, workout_type, intensity_level, duration_minutes, notes, workout_date, calories_burned)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-            [userId, workoutName, workoutType, workoutIntensity, duration, notes || null, date, caloriesBurned]
+             (user_id, workout_name, workout_type, intensity_level, duration_minutes, notes, workout_date, calories_burned, favorite_flag)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            [userId, workoutName, workoutType, workoutIntensity, duration, notes || null, date, caloriesBurned, favorite ? 1 : 0]
         );
 
         console.log('Insert result:', insertResult);
@@ -377,7 +400,7 @@ app.get('/api/workouts', authenticateToken, async (req, res) => {
     try {
         const connection = await createConnection();
         const [rows] = await connection.execute(
-            `SELECT workout_date, workout_name, workout_type, intensity_level, duration_minutes, calories_burned, notes
+            `SELECT workout_id, workout_date, workout_name, workout_type, intensity_level, duration_minutes, calories_burned, notes, favorite_flag
              FROM workouts
              WHERE user_id = (SELECT user_id FROM user WHERE email = ?)
              ORDER BY workout_date DESC`,
@@ -392,12 +415,211 @@ app.get('/api/workouts', authenticateToken, async (req, res) => {
     }
 });
 
+// Route: Get User Favorite Workouts
+app.get('/api/workouts/favorites', authenticateToken, async (req, res) => {
+    try {
+        const connection = await createConnection();
+        const [rows] = await connection.execute(
+            `SELECT workout_id, workout_name, workout_type, intensity_level, duration_minutes, calories_burned, notes
+             FROM workouts
+             WHERE user_id = (SELECT user_id FROM user WHERE email = ?)
+             AND favorite_flag = 1
+             ORDER BY workout_name ASC, workout_id DESC`,
+            [req.user.email]
+        );
+        await connection.end();
+
+        res.status(200).json({ favorites: rows });
+    } catch (error) {
+        console.error('DB ERROR:', error);
+        res.status(500).json({ message: 'Error retrieving favorite workouts.' });
+    }
+});
+
+// Route: Log a favorite workout using today's local date
+app.post('/api/workouts/favorites/:workoutId/log', authenticateToken, async (req, res) => {
+    const { workoutId } = req.params;
+
+    let connection;
+    try {
+        connection = await createConnection();
+
+        const [userRows] = await connection.execute(
+            'SELECT user_id FROM user WHERE email = ?',
+            [req.user.email]
+        );
+
+        if (userRows.length === 0) {
+            return res.status(404).json({ message: 'User not found.' });
+        }
+
+        const userId = userRows[0].user_id;
+
+        const [favoriteRows] = await connection.execute(
+            `SELECT workout_name, workout_type, intensity_level, duration_minutes, calories_burned, notes
+             FROM workouts
+             WHERE workout_id = ? AND user_id = ? AND favorite_flag = 1`,
+            [workoutId, userId]
+        );
+
+        if (favoriteRows.length === 0) {
+            return res.status(404).json({ message: 'Favorite workout not found.' });
+        }
+
+        const favoriteWorkout = favoriteRows[0];
+        const today = getLocalDateForSql();
+
+        await connection.execute(
+            `INSERT INTO workouts
+             (user_id, workout_name, workout_type, intensity_level, duration_minutes, notes, workout_date, calories_burned, favorite_flag)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            [
+                userId,
+                favoriteWorkout.workout_name,
+                favoriteWorkout.workout_type,
+                favoriteWorkout.intensity_level,
+                favoriteWorkout.duration_minutes,
+                favoriteWorkout.notes,
+                today,
+                favoriteWorkout.calories_burned,
+                0
+            ]
+        );
+
+        res.status(201).json({ message: 'Favorite workout logged successfully!' });
+    } catch (error) {
+        console.error('DB ERROR:', error);
+        res.status(500).json({ message: 'Error logging favorite workout.' });
+    } finally {
+        if (connection) {
+            await connection.end();
+        }
+    }
+});
+
+// Route: Delete a user workout
+app.delete('/api/workouts/:workoutId', authenticateToken, async (req, res) => {
+    const { workoutId } = req.params;
+
+    let connection;
+    try {
+        connection = await createConnection();
+
+        const [userRows] = await connection.execute(
+            'SELECT user_id FROM user WHERE email = ?',
+            [req.user.email]
+        );
+
+        if (userRows.length === 0) {
+            return res.status(404).json({ message: 'User not found.' });
+        }
+
+        const userId = userRows[0].user_id;
+
+        const [deleteResult] = await connection.execute(
+            'DELETE FROM workouts WHERE workout_id = ? AND user_id = ?',
+            [workoutId, userId]
+        );
+
+        if (deleteResult.affectedRows === 0) {
+            return res.status(404).json({ message: 'Workout not found.' });
+        }
+
+        res.status(200).json({ message: 'Workout deleted successfully!' });
+    } catch (error) {
+        console.error('DB ERROR:', error);
+        res.status(500).json({ message: 'Error deleting workout.' });
+    } finally {
+        if (connection) {
+            await connection.end();
+        }
+    }
+});
+
+// Route: Remove a workout from favorites
+app.patch('/api/workouts/:workoutId/favorite', authenticateToken, async (req, res) => {
+    const { workoutId } = req.params;
+
+    let connection;
+    try {
+        connection = await createConnection();
+
+        const [userRows] = await connection.execute(
+            'SELECT user_id FROM user WHERE email = ?',
+            [req.user.email]
+        );
+
+        if (userRows.length === 0) {
+            return res.status(404).json({ message: 'User not found.' });
+        }
+
+        const userId = userRows[0].user_id;
+
+        const [updateResult] = await connection.execute(
+            'UPDATE workouts SET favorite_flag = 0 WHERE workout_id = ? AND user_id = ?',
+            [workoutId, userId]
+        );
+
+        if (updateResult.affectedRows === 0) {
+            return res.status(404).json({ message: 'Workout not found.' });
+        }
+
+        res.status(200).json({ message: 'Workout removed from favorites!' });
+    } catch (error) {
+        console.error('DB ERROR:', error);
+        res.status(500).json({ message: 'Error updating workout favorite.' });
+    } finally {
+        if (connection) {
+            await connection.end();
+        }
+    }
+});
+
+// Route: Add a workout to favorites
+app.patch('/api/workouts/:workoutId/favorite/add', authenticateToken, async (req, res) => {
+    const { workoutId } = req.params;
+
+    let connection;
+    try {
+        connection = await createConnection();
+
+        const [userRows] = await connection.execute(
+            'SELECT user_id FROM user WHERE email = ?',
+            [req.user.email]
+        );
+
+        if (userRows.length === 0) {
+            return res.status(404).json({ message: 'User not found.' });
+        }
+
+        const userId = userRows[0].user_id;
+
+        const [updateResult] = await connection.execute(
+            'UPDATE workouts SET favorite_flag = 1 WHERE workout_id = ? AND user_id = ?',
+            [workoutId, userId]
+        );
+
+        if (updateResult.affectedRows === 0) {
+            return res.status(404).json({ message: 'Workout not found.' });
+        }
+
+        res.status(200).json({ message: 'Workout added to favorites!' });
+    } catch (error) {
+        console.error('DB ERROR:', error);
+        res.status(500).json({ message: 'Error updating workout favorite.' });
+    } finally {
+        if (connection) {
+            await connection.end();
+        }
+    }
+});
+
 // Route: Get User Meals
 app.get('/api/meals', authenticateToken, async (req, res) => {
     try {
         const connection = await createConnection();
         const [rows] = await connection.execute(
-            `SELECT meal_date, meal_type, description, calories, protein, fats, carbs
+            `SELECT meal_id, meal_date, meal_type, description, calories, protein, fats, carbs, favorite_flag
              FROM meals
              WHERE user_id = (SELECT user_id FROM user WHERE email = ?)
              ORDER BY meal_date DESC`,
@@ -409,6 +631,205 @@ app.get('/api/meals', authenticateToken, async (req, res) => {
     } catch (error) {
         console.error('DB ERROR:', error);
         res.status(500).json({ message: 'Error retrieving meals.' });
+    }
+});
+
+// Route: Get User Favorite Meals
+app.get('/api/meals/favorites', authenticateToken, async (req, res) => {
+    try {
+        const connection = await createConnection();
+        const [rows] = await connection.execute(
+            `SELECT meal_id, meal_type, description, calories, protein, fats, carbs
+             FROM meals
+             WHERE user_id = (SELECT user_id FROM user WHERE email = ?)
+             AND favorite_flag = 1
+             ORDER BY description ASC, meal_id DESC`,
+            [req.user.email]
+        );
+        await connection.end();
+
+        res.status(200).json({ favorites: rows });
+    } catch (error) {
+        console.error('DB ERROR:', error);
+        res.status(500).json({ message: 'Error retrieving favorite meals.' });
+    }
+});
+
+// Route: Log a favorite meal using today's local date
+app.post('/api/meals/favorites/:mealId/log', authenticateToken, async (req, res) => {
+    const { mealId } = req.params;
+
+    let connection;
+    try {
+        connection = await createConnection();
+
+        const [userRows] = await connection.execute(
+            'SELECT user_id FROM user WHERE email = ?',
+            [req.user.email]
+        );
+
+        if (userRows.length === 0) {
+            return res.status(404).json({ message: 'User not found.' });
+        }
+
+        const userId = userRows[0].user_id;
+
+        const [favoriteRows] = await connection.execute(
+            `SELECT meal_type, description, calories, protein, fats, carbs
+             FROM meals
+             WHERE meal_id = ? AND user_id = ? AND favorite_flag = 1`,
+            [mealId, userId]
+        );
+
+        if (favoriteRows.length === 0) {
+            return res.status(404).json({ message: 'Favorite meal not found.' });
+        }
+
+        const favoriteMeal = favoriteRows[0];
+        const today = getLocalDateForSql();
+
+        await connection.execute(
+            `INSERT INTO meals
+             (user_id, meal_date, meal_type, description, calories, protein, fats, carbs, favorite_flag)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            [
+                userId,
+                today,
+                favoriteMeal.meal_type,
+                favoriteMeal.description,
+                favoriteMeal.calories,
+                favoriteMeal.protein,
+                favoriteMeal.fats,
+                favoriteMeal.carbs,
+                0
+            ]
+        );
+
+        res.status(201).json({ message: 'Favorite meal logged successfully!' });
+    } catch (error) {
+        console.error('DB ERROR:', error);
+        res.status(500).json({ message: 'Error logging favorite meal.' });
+    } finally {
+        if (connection) {
+            await connection.end();
+        }
+    }
+});
+
+// Route: Delete a user meal
+app.delete('/api/meals/:mealId', authenticateToken, async (req, res) => {
+    const { mealId } = req.params;
+
+    let connection;
+    try {
+        connection = await createConnection();
+
+        const [userRows] = await connection.execute(
+            'SELECT user_id FROM user WHERE email = ?',
+            [req.user.email]
+        );
+
+        if (userRows.length === 0) {
+            return res.status(404).json({ message: 'User not found.' });
+        }
+
+        const userId = userRows[0].user_id;
+
+        const [deleteResult] = await connection.execute(
+            'DELETE FROM meals WHERE meal_id = ? AND user_id = ?',
+            [mealId, userId]
+        );
+
+        if (deleteResult.affectedRows === 0) {
+            return res.status(404).json({ message: 'Meal not found.' });
+        }
+
+        res.status(200).json({ message: 'Meal deleted successfully!' });
+    } catch (error) {
+        console.error('DB ERROR:', error);
+        res.status(500).json({ message: 'Error deleting meal.' });
+    } finally {
+        if (connection) {
+            await connection.end();
+        }
+    }
+});
+
+// Route: Remove a meal from favorites
+app.patch('/api/meals/:mealId/favorite', authenticateToken, async (req, res) => {
+    const { mealId } = req.params;
+
+    let connection;
+    try {
+        connection = await createConnection();
+
+        const [userRows] = await connection.execute(
+            'SELECT user_id FROM user WHERE email = ?',
+            [req.user.email]
+        );
+
+        if (userRows.length === 0) {
+            return res.status(404).json({ message: 'User not found.' });
+        }
+
+        const userId = userRows[0].user_id;
+
+        const [updateResult] = await connection.execute(
+            'UPDATE meals SET favorite_flag = 0 WHERE meal_id = ? AND user_id = ?',
+            [mealId, userId]
+        );
+
+        if (updateResult.affectedRows === 0) {
+            return res.status(404).json({ message: 'Meal not found.' });
+        }
+
+        res.status(200).json({ message: 'Meal removed from favorites!' });
+    } catch (error) {
+        console.error('DB ERROR:', error);
+        res.status(500).json({ message: 'Error updating meal favorite.' });
+    } finally {
+        if (connection) {
+            await connection.end();
+        }
+    }
+});
+
+// Route: Add a meal to favorites
+app.patch('/api/meals/:mealId/favorite/add', authenticateToken, async (req, res) => {
+    const { mealId } = req.params;
+
+    let connection;
+    try {
+        connection = await createConnection();
+
+        const [userRows] = await connection.execute(
+            'SELECT user_id FROM user WHERE email = ?',
+            [req.user.email]
+        );
+
+        if (userRows.length === 0) {
+            return res.status(404).json({ message: 'User not found.' });
+        }
+
+        const userId = userRows[0].user_id;
+
+        const [updateResult] = await connection.execute(
+            'UPDATE meals SET favorite_flag = 1 WHERE meal_id = ? AND user_id = ?',
+            [mealId, userId]
+        );
+
+        if (updateResult.affectedRows === 0) {
+            return res.status(404).json({ message: 'Meal not found.' });
+        }
+
+        res.status(200).json({ message: 'Meal added to favorites!' });
+    } catch (error) {
+        console.error('DB ERROR:', error);
+        res.status(500).json({ message: 'Error updating meal favorite.' });
+    } finally {
+        if (connection) {
+            await connection.end();
+        }
     }
 });
 
@@ -544,7 +965,7 @@ app.post('/api/log-suggested-workout', authenticateToken, async (req, res) => {
     try {
         const connection = await createConnection();
 
-        const today = new Date().toISOString().split('T')[0];
+        const today = getLocalDateForSql();
 
         await connection.execute(
             `INSERT INTO workouts (user_id, workout_name, workout_type, intensity_level, duration_minutes, calories_burned, notes, workout_date)
@@ -602,7 +1023,7 @@ app.post('/api/log-suggested-meal', authenticateToken, async (req, res) => {
     try {
         const connection = await createConnection();
 
-        const today = new Date().toISOString().split('T')[0];
+        const today = getLocalDateForSql();
 
         await connection.execute(
             `INSERT INTO meals (user_id, meal_date, meal_type, description, calories, protein, fats, carbs)
