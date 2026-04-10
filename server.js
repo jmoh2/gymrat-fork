@@ -896,6 +896,30 @@ app.get('/api/calories-burned-today', authenticateToken, async (req, res) => {
     }
 }); 
 
+// Route: Get Calories Consumed Today
+app.get('/api/calories-consumed-today', authenticateToken, async (req, res) => {
+    try {
+        const connection = await createConnection();
+        const today = getLocalDateForSql();
+
+        const [result] = await connection.execute(
+            `SELECT SUM(calories) AS total_calories
+             FROM meals
+             WHERE user_id = (SELECT user_id FROM user WHERE email = ?)
+             AND meal_date = ?`,
+            [req.user.email, today]
+        );
+
+        await connection.end();
+
+        const caloriesConsumed = result[0].total_calories || 0;
+        res.status(200).json({ total: caloriesConsumed });
+    } catch (error) {
+        console.error('DB ERROR:', error);
+        res.status(500).json({ message: 'Error retrieving calories consumed today.' });
+    }
+});
+
 // Route: Get Active Days This Week
 app.get('/api/active-days-this-week', authenticateToken, async (req, res) => {
     try {
