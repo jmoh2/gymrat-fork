@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Workout Input and Tracker</title>
     <link rel="stylesheet" href="css/workout.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 </head>
 <body>
     <div class="header-bar">
@@ -24,7 +26,7 @@
 </div>
 
   
-<<!-- Suggested Meal Card -->
+<!-- Suggested Meal Card -->
 <div id="mealSuggestionCard" style="
     background: #f0fff4;
     border: 1px solid #a8d5b5;
@@ -36,7 +38,7 @@
 ">
     <strong>Suggested Meals</strong>
     <div id="mealSuggestionContent" style="margin-top: 8px; display: flex; flex-direction: row; gap: 12px;"></div>
-    <button id="logMealSuggestionButton" style="margin-top: 10px;">Log Selected Meal</button>
+    <button class = "button" id="logMealSuggestionButton" style="margin-top: 10px;">Log Selected Meal</button>
     <p id="mealSuggestionResult" style="font-size: 12px; margin-top: 6px; color: green;"></p>
 </div>
 
@@ -48,7 +50,7 @@
     <input type="date" id="mealDate" required>
     </div>
 
-     <div class="form-group">
+     <div class="form-group quarter">
     <label for="mealType">Meal Type:</label>
     <select id="mealType" required>
         <option value="">Select</option>
@@ -59,7 +61,7 @@
     </select>
     </div>
 
-     <div class="form-group">
+     <div class="form-group quarter">
     <label for="mealDescription">Meal Description:</label>
     <input type="text" id="mealDescription" required>
     </div>
@@ -84,21 +86,57 @@
     <input type="number" id="carbs" required>
     </div>
 
-    <div class="form-group favorite-toggle">
+<div class="form-group favorite-toggle">
     <label for="favoriteMeal">Favorite Meal:</label>
     <div class="checkbox-row">
         <input type="checkbox" id="favoriteMeal">
         <span>Save this meal to favorites</span>
     </div>
-    </div>
+</div>
 
     <button id="addMealButton" type="button" class="tablebutton">Add Meal</button>
 </div>
 
 <br>
 
+<!-- FAVORITE MEALS PORTION -->
+<div class="card">
+    <h3>Favorite Meals</h3>
+
+    <table id="favoriteMealTable">
+        <thead>
+            <tr>
+                <th>Meal Type</th>
+                <th>Meal Description</th>
+                <th>Calories</th>
+                <th>Protein</th>
+                <th>Fats</th>
+                <th>Carbs</th>
+                <th>Use Favorite</th>
+                <th>Remove Favorite</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
+
+
+<!-- CHART CARD -->
+<div class="chart-card">
+    <div class="chart-controls">
+            <button class="chart-button" onclick="switchChart('bar')">Bar</button>
+            <button class="chart-button" onclick="switchChart('line')">Line</button>
+        </div>
+    <div class="chart-area">
+        <canvas id="mealChart"></canvas>
+     </div>
+</div>
+
+<br>
+
+
+<!-- FILTER PORTION -->
 <div class="filter-container">
-    
 <h3>Filter for Table</h3>
 
     <div class="form-group">
@@ -173,28 +211,9 @@
 
 </div>
 
+
+
 <!-- Actual Table for Past Meals -->
-
-<div class="card">
-    <h3>Favorite Meals</h3>
-
-    <table id="favoriteMealTable">
-        <thead>
-            <tr>
-                <th>Meal Type</th>
-                <th>Meal Description</th>
-                <th>Calories</th>
-                <th>Protein</th>
-                <th>Fats</th>
-                <th>Carbs</th>
-                <th>Use Favorite</th>
-                <th>Remove Favorite</th>
-            </tr>
-        </thead>
-        <tbody></tbody>
-    </table>
-</div>
-
 <div class="card">
     <h3>Past Meals</h3>
 
