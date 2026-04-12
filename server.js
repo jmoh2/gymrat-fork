@@ -1023,9 +1023,9 @@ app.get('/api/suggested-meal', authenticateToken, async (req, res) => {
         const fitnessGoal = profileRows[0].fitness_goal;
 
         const [mealRows] = await connection.execute(
-            'SELECT * FROM meal_suggestions WHERE linked_goal = ? ORDER BY RAND() LIMIT 1',
-            [fitnessGoal]
-        );
+    'SELECT * FROM meal_suggestions WHERE linked_goal = ? ORDER BY RAND() LIMIT 3',
+    [fitnessGoal]
+);
 
         await connection.end();
 
@@ -1033,7 +1033,7 @@ app.get('/api/suggested-meal', authenticateToken, async (req, res) => {
             return res.status(404).json({ message: 'No suggested meal found.' });
         }
 
-        res.status(200).json(mealRows[0]);
+        res.status(200).json(mealRows);
     } catch (error) {
         console.error('DB ERROR:', error);
         res.status(500).json({ message: 'Error retrieving suggested meal.' });

@@ -374,35 +374,74 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     async function loadSuggestedMeal() {
-        const suggestion = await DataModel.getSuggestedMeal();
-        const content = document.getElementById("mealSuggestionContent");
-        const logButton = document.getElementById("logMealSuggestionButton");
-        const result = document.getElementById("mealSuggestionResult");
+    const suggestions = await DataModel.getSuggestedMeal();
+    const content = document.getElementById('mealSuggestionContent');
+    const logButton = document.getElementById('logMealSuggestionButton');
+    const result = document.getElementById('mealSuggestionResult');
 
-        if (!suggestion) {
-            content.textContent = "No suggestion available.";
-            logButton.style.display = "none";
+    if (!suggestions || suggestions.length === 0) {
+        content.textContent = 'No suggestions available.';
+        logButton.style.display = 'none';
+        return;
+    }
+
+    // Handle both array and single object responses
+    const mealList = Array.isArray(suggestions) ? suggestions : [suggestions];
+
+    content.innerHTML = mealList.map((meal, index) => `
+    <div style="flex: 1; display: flex; align-items: flex-start; gap: 6px; padding: 10px; border: 1px solid #c8e6c9; border-radius: 8px; background: #fff;">
+        <input type="checkbox" id="mealCheck_${index}" style="margin-top: 3px; flex-shrink: 0; width: 12px; height: 12px;">
+        <label for="mealCheck_${index}" style="cursor: pointer; font-size: 12px; line-height: 1.4;">
+            <b>${meal.meal_title}</b><br>
+            ${meal.description}<br>
+            Calories: ${meal.calories} &nbsp;|&nbsp;
+            Protein: ${meal.protein}g &nbsp;|&nbsp;
+            Carbs: ${meal.carbs}g &nbsp;|&nbsp;
+            Fats: ${meal.fats}g
+        </label>
+    </div>
+`).join('');
+
+// Add this block right after the innerHTML assignment
+mealList.forEach((_, index) => {
+    document.getElementById(`mealCheck_${index}`).addEventListener('change', () => {
+        mealList.forEach((_, otherIndex) => {
+            if (otherIndex !== index) {
+                document.getElementById(`mealCheck_${otherIndex}`).checked = false;
+            }
+        });
+    });
+});
+
+    logButton.onclick = async () => {
+        const checked = mealList.filter((_, index) => 
+            document.getElementById(`mealCheck_${index}`)?.checked
+        );
+
+        if (checked.length === 0) {
+            result.textContent = 'Please select at least one meal.';
+            result.style.color = 'orange';
             return;
         }
 
-        content.innerHTML = `
-            <b>${suggestion.meal_title}</b><br>
-            ${suggestion.description}<br>
-            Calories: ${suggestion.calories} | Protein: ${suggestion.protein}g | Carbs: ${suggestion.carbs}g | Fats: ${suggestion.fats}g
-        `;
+        let allSuccess = true;
+        for (const meal of checked) {
+            const success = await DataModel.logSuggestedMeal(meal);
+            if (!success) allSuccess = false;
+        }
 
-        logButton.addEventListener("click", async () => {
-            const success = await DataModel.logSuggestedMeal(suggestion);
-            if (success) {
-                result.textContent = "Meal logged!";
-                result.style.color = "green";
-                await refreshMealTables();
-            } else {
-                result.textContent = "Error logging meal.";
-                result.style.color = "red";
-            }
-        });
-    }
+        if (allSuccess) {
+            result.textContent = `${checked.length} meal(s) logged!`;
+            result.style.color = 'green';
+            await renderMeals();
+            applyFilters();
+        } else {
+            result.textContent = 'Error logging one or more meals.';
+            result.style.color = 'red';
+        }
+    };
+}
+
 
     async function addMeal() {
         const dateInput = mealDateInput.value;
