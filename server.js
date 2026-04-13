@@ -877,7 +877,7 @@ app.get('/api/meal-count', authenticateToken, async (req, res) => {
 app.get('/api/calories-burned-today', authenticateToken, async (req, res) => {
     try {
         const connection = await createConnection();
-        const today = new Date().toISOString().split('T')[0];
+        const today = new Date().toLocaleDateString('en-CA'); 
 
         const [result] = await connection.execute(
             `SELECT SUM(calories_burned) AS total_calories
@@ -925,8 +925,15 @@ app.get('/api/active-days-this-week', authenticateToken, async (req, res) => {
     try {
         const connection = await createConnection();
         const today = new Date();
-        const startOfWeek = new Date(today.setDate(today.getDate() - today.getDay())).toISOString().split('T')[0];
-        const endOfWeek = new Date(today.setDate(today.getDate() - today.getDay() + 6)).toISOString().split('T')[0];
+
+        const start = new Date(today);
+        start.setDate(today.getDate() - today.getDay());
+
+        const end = new Date(start);
+        end.setDate(start.getDate() + 6);
+
+        const startOfWeek = start.toLocaleDateString('en-CA');
+        const endOfWeek = end.toLocaleDateString('en-CA');
 
         const [result] = await connection.execute(
             `SELECT COUNT(DISTINCT workout_date) AS active_days
