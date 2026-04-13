@@ -6,6 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             DataModel.setToken(token);
             displayWelcomeMessage();
+            displayOldAccountAlert();
         }
     
     //////////////////////////////////////////
@@ -32,6 +33,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const userName = await DataModel.getUserName();
         welcomeHeading.textContent = `Welcome to GymRat, ${userName}!`;
+    }
+
+    async function displayOldAccountAlert() {
+        const alertElement = document.getElementById('oldAccountAlert');
+
+        try {
+            const res = await fetch('/api/user-profile-status', {
+                headers: {
+                    "Authorization": token
+                }
+            });
+            const data = await res.json();
+
+            if (!res.ok) {
+                console.error('Error checking profile status:', data.message);
+                return;
+            }
+
+            alertElement.style.display = data.hasProfile ? 'none' : 'block';
+        } catch (error) {
+            console.error('Error checking profile status:', error);
+        }
     }
 
     // Fetch and display total workout count

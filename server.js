@@ -371,6 +371,23 @@ app.get('/api/user-profile', authenticateToken, async (req, res) => {
     }
 });
 
+// Route: Check if the logged-in user has a profile row
+app.get('/api/user-profile-status', authenticateToken, async (req, res) => {
+    try {
+        const connection = await createConnection();
+        const [rows] = await connection.execute(
+            'SELECT user_id FROM user_profile WHERE user_id = (SELECT user_id FROM user WHERE email = ?) LIMIT 1',
+            [req.user.email]
+        );
+        await connection.end();
+
+        res.status(200).json({ hasProfile: rows.length > 0 });
+    } catch (error) {
+        console.error('DB ERROR:', error);
+        res.status(500).json({ message: 'Error checking profile status.' });
+    }
+});
+
 
 // Route: Update User Profile
 app.put('/api/user-profile', authenticateToken, async (req, res) => {
@@ -380,18 +397,47 @@ app.put('/api/user-profile', authenticateToken, async (req, res) => {
         return res.status(400).json({ message: 'Height, weight, fitness goal, and exercise level are required.' });
     }
 
+    let connection;
     try {
-        const connection = await createConnection();
-        await connection.execute(
-            'UPDATE user_profile SET gender = ?, age = ?, height = ?, weight = ?, fitness_goal = ?, exercise_level = ? WHERE user_id = (SELECT user_id FROM user WHERE email = ?)',
-            [gender, age, height, weight, fitness_goal, exercise_level, req.user.email]
+        connection = await createConnection();
+        const [userRows] = await connection.execute(
+            'SELECT user_id FROM user WHERE email = ?',
+            [req.user.email]
         );
-        await connection.end();
+
+        if (userRows.length === 0) {
+            return res.status(404).json({ message: 'User not found.' });
+        }
+
+        const userId = userRows[0].user_id;
+
+        const [profileRows] = await connection.execute(
+            'SELECT user_id FROM user_profile WHERE user_id = ?',
+            [userId]
+        );
+
+        if (profileRows.length === 0) {
+            await connection.execute(
+                `INSERT INTO user_profile
+                (user_id, height, weight, gender, age, fitness_goal, exercise_level)
+                VALUES (?, ?, ?, ?, ?, ?, ?)`,
+                [userId, height, weight, gender, age, fitness_goal, exercise_level]
+            );
+        } else {
+            await connection.execute(
+                'UPDATE user_profile SET gender = ?, age = ?, height = ?, weight = ?, fitness_goal = ?, exercise_level = ? WHERE user_id = ?',
+                [gender, age, height, weight, fitness_goal, exercise_level, userId]
+            );
+        }
 
         res.status(200).json({ message: 'Profile updated successfully!' });
     } catch (error) {
         console.error('DB ERROR:', error);
         res.status(500).json({ message: 'Error updating profile.' });
+    } finally {
+        if (connection) {
+            await connection.end();
+        }
     }
 });
 
