@@ -962,11 +962,11 @@ app.get('/api/suggested-workout', authenticateToken, async (req, res) => {
 
         const fitnessGoal = profileRows[0].fitness_goal;
 
-        // Get a random suggested workout matching the user's goal
+        // Gets a 3 random suggested workout matching the user's goal
         const [workoutRows] = await connection.execute(
-    'SELECT * FROM workout_suggestions WHERE fitness_goal = ? ORDER BY RAND() LIMIT 1',
+    'SELECT * FROM workout_suggestions WHERE fitness_goal = ? ORDER BY RAND() LIMIT 3',
     [fitnessGoal]
-    );
+);
 
         await connection.end();
 
@@ -974,7 +974,7 @@ app.get('/api/suggested-workout', authenticateToken, async (req, res) => {
             return res.status(404).json({ message: 'No suggested workout found.' });
         }
 
-        res.status(200).json(workoutRows[0]);
+        res.status(200).json(workoutRows);
     } catch (error) {
         console.error('DB ERROR:', error);
         res.status(500).json({ message: 'Error retrieving suggested workout.' });
