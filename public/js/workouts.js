@@ -366,37 +366,65 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     async function loadSuggestedWorkout() {
-        const suggestion = await DataModel.getSuggestedWorkout();
-        const content = document.getElementById("suggestionContent");
-        const logButton = document.getElementById("logSuggestionButton");
-        const suggestionResult = document.getElementById("suggestionResult");
+    const suggestions = await DataModel.getSuggestedWorkout();
+    const content = document.getElementById("suggestionContent");
+    const logButton = document.getElementById("logSuggestionButton");
+    const suggestionResult = document.getElementById("suggestionResult");
 
-        if (!suggestion) {
-            content.textContent = "No suggestion available.";
-            logButton.style.display = "none";
+    if (!suggestions || suggestions.length === 0) {
+        content.textContent = "No suggestion available.";
+        logButton.style.display = "none";
+        return;
+    }
+
+    const workoutList = Array.isArray(suggestions) ? suggestions : [suggestions];
+
+    content.innerHTML = workoutList.map((workout, index) => `
+    <div style="display: flex; align-items: flex-start; gap: 6px; padding: 10px; border: 1px solid #c0c8f0; border-radius: 8px; background: #fff;">
+        <input type="checkbox" id="workoutCheck_${index}" style="margin-top: 3px; flex-shrink: 0; width: 12px; height: 12px;">
+        <label for="workoutCheck_${index}" style="cursor: pointer; font-size: 12px; line-height: 1.4;">
+            <b>${workout.workout_name}</b><br>
+            Type: ${workout.workout_type}<br>
+            Intensity: ${workout.intensity_level}<br>
+            Duration: ${workout.duration_minutes} mins<br>
+            Calories: ${workout.calories_burned}
+        </label>
+    </div>
+`).join('');
+
+    // Only allow one checkbox at a time
+    workoutList.forEach((_, index) => {
+        document.getElementById(`workoutCheck_${index}`).addEventListener('change', () => {
+            workoutList.forEach((_, otherIndex) => {
+                if (otherIndex !== index) {
+                    document.getElementById(`workoutCheck_${otherIndex}`).checked = false;
+                }
+            });
+        });
+    });
+
+    logButton.onclick = async () => {
+        const checked = workoutList.filter((_, index) =>
+            document.getElementById(`workoutCheck_${index}`)?.checked
+        );
+
+        if (checked.length === 0) {
+            suggestionResult.textContent = "Please select a workout.";
+            suggestionResult.style.color = "orange";
             return;
         }
 
-        content.innerHTML = `
-            <b>${suggestion.workout_name}</b><br>
-            Type: ${suggestion.workout_type}<br>
-            Intensity: ${suggestion.intensity_level}<br>
-            Duration: ${suggestion.duration_minutes} mins<br>
-            Calories: ${suggestion.calories_burned}
-        `;
-
-        logButton.addEventListener("click", async () => {
-            const success = await DataModel.logSuggestedWorkout(suggestion);
-            if (success) {
-                suggestionResult.textContent = "Logged!";
-                suggestionResult.style.color = "green";
-                await refreshWorkoutTables();
-            } else {
-                suggestionResult.textContent = "Error logging workout.";
-                suggestionResult.style.color = "red";
-            }
-        });
-    }
+        const success = await DataModel.logSuggestedWorkout(checked[0]);
+        if (success) {
+            suggestionResult.textContent = "Logged!";
+            suggestionResult.style.color = "green";
+            await refreshWorkoutTables();
+        } else {
+            suggestionResult.textContent = "Error logging workout.";
+            suggestionResult.style.color = "red";
+        }
+    };
+}
 
     async function submitWorkout() {
         const workoutName = document.getElementById("workoutName").value.trim();
