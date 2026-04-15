@@ -124,6 +124,12 @@ body {
     margin-bottom: 20px;
     font-size: 18px;
     font-weight: 700;
+    white-space: nowrap;
+}
+
+.container h3 {
+    grid-column: 1 / -1;
+    margin-bottom: 4px;
 }
 
 .container {
@@ -132,10 +138,10 @@ body {
     border-radius: 12px;
     box-shadow: var(--shadow-md);
     margin-bottom: 24px;
-    max-width: 1000px;
+    max-width: 1250px;
 
     display: grid;
-    grid-template-columns: repeat(12, 1fr);
+    grid-template-columns: repeat(12, minmax(0, 1fr));
     gap: 12px;
 }
 
@@ -249,6 +255,7 @@ input {
 
 .form-group label {
     margin-bottom: 8px;
+    white-space: nowrap;
 }
 
 .button-row {
@@ -269,6 +276,11 @@ input {
     font-weight: 600;
     transition: all 0.3s ease;
     font-family: inherit;
+    white-space: nowrap;
+}
+
+#addMealButton {
+    min-width: 112px;
 }
 
 .tablebutton:hover {
