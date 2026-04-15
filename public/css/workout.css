@@ -238,6 +238,15 @@ input {
     font-family: inherit;
 }
 
+.inputsubmit-button:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.inputsubmit-button:active {
+    transform: translateY(0);
+}
+
 .form-group label {
     margin-bottom: 8px;
 }
@@ -538,6 +547,15 @@ img {
     transition: all 0.3s ease;
     text-decoration: none;
     font-family: inherit;
+}
+
+.chart-button:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.chart-button:active {
+    transform: translateY(0);
 }
 
 .chart-controls {

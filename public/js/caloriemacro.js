@@ -68,6 +68,19 @@ function getMealActionColor(action) {
     return action === "favorite" ? "#1f9d55" : "#d64545";
 }
 
+function formatDisplayText(value) {
+    if (!value) {
+        return "";
+    }
+
+    return String(value)
+        .replace(/_/g, " ")
+        .split(" ")
+        .filter(Boolean)
+        .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+        .join(" ");
+}
+
 async function renderMeals() {
     const token = localStorage.getItem("jwtToken");
     const tbody = document.querySelector("#mealTable tbody");
@@ -94,7 +107,7 @@ async function renderMeals() {
             row.dataset.mealId = meal.meal_id;
             row.innerHTML = `
                 <td>${formatDateForDisplay(meal.meal_date)}</td>
-                <td>${meal.meal_type}</td>
+                <td>${formatDisplayText(meal.meal_type)}</td>
                 <td>${meal.description}</td>
                 <td>${meal.calories}</td>
                 <td>${meal.protein}</td>
@@ -150,7 +163,7 @@ async function renderFavoriteMeals() {
         data.favorites.forEach((meal) => {
             const row = document.createElement("tr");
             row.innerHTML = `
-                <td>${meal.meal_type}</td>
+                <td>${formatDisplayText(meal.meal_type)}</td>
                 <td>${meal.description}</td>
                 <td>${meal.calories}</td>
                 <td>${meal.protein}</td>
@@ -364,9 +377,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 return;
             }
 
-            goalText = goalText.replace(/_/g, " ");
-
-            document.getElementById("currentGoal").textContent = goalText;
+            document.getElementById("currentGoal").textContent = formatDisplayText(goalText);
             document.getElementById("goalCard").style.display = "inline-flex";
         } catch (error) {
             console.error("Error fetching goal:", error);

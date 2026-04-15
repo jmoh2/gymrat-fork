@@ -84,6 +84,10 @@ body {
     box-shadow: var(--shadow-lg);
 }
 
+#logoutButton:active, #refreshButton:active {
+    transform: translateY(0);
+}
+
 .user-list {
     margin-top: 24px;
 }
