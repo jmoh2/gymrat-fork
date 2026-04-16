@@ -30,9 +30,9 @@ body {
 
 .logo {
     display: block;
-    max-width: 120px;
+    max-width: 108px;
     height: auto;
-    margin: 40px auto 20px;
+    margin: 22px auto 30px;
 }
 
 .header-bar {
@@ -82,23 +82,22 @@ body {
 .welcome-message {
     background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
     color: var(--white);
-    padding: 32px;
-    border-radius: 12px;
+    padding: 18px 30px;
+    border-radius: 0 0 16px 16px;
     box-shadow: var(--shadow-lg);
-    width: 90%;
-    max-width: 700px;
-    margin: 30px auto 0;
+    width: min(100%, 1180px);
+    margin: 0 auto;
     text-align: center;
 }
 
 .welcome-message h1 {
-    font-size: 28px;
-    margin-bottom: 8px;
+    font-size: 24px;
+    margin-bottom: 4px;
     font-weight: 700;
 }
 
 .welcome-message p {
-    font-size: 16px;
+    font-size: 14px;
     opacity: 0.95;
     font-weight: 400;
 }
@@ -156,16 +155,19 @@ body {
 }
 
 .dashboard-links {
+    width: 90%;
+    max-width: 1120px;
+    margin: 38px auto 84px;
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 18px;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 22px;
 }
 
 .nav-card {
     position: relative;
     display: flex;
-    min-height: 150px;
-    padding: 22px;
+    min-height: 190px;
+    padding: 28px;
     overflow: hidden;
     isolation: isolate;
     color: var(--primary-blue);
@@ -229,23 +231,23 @@ body {
 }
 
 .nav-card-title {
-    font-size: 20px;
+    font-size: 22px;
     font-weight: 800;
     letter-spacing: 0.2px;
 }
 
 .nav-card-description {
     color: var(--text-light);
-    font-size: 13px;
+    font-size: 14px;
     line-height: 1.45;
 }
 
 .nav-card-icon {
     position: absolute;
-    right: -10px;
-    top: -14px;
-    width: 112px;
-    height: 112px;
+    right: -14px;
+    top: -18px;
+    width: 128px;
+    height: 128px;
     color: var(--primary-blue);
     fill: none;
     stroke: currentColor;
@@ -263,14 +265,31 @@ body {
 }
 
 .nav-card-icon-meals {
-    right: -2px;
-    top: -10px;
-    width: 96px;
-    height: 96px;
+    right: -4px;
+    top: -12px;
+    width: 108px;
+    height: 108px;
 }
 
 .nav-card:hover .nav-card-icon-meals {
     transform: rotate(-4deg) scale(1.02);
+}
+
+.nav-card-icon-analytics {
+    right: -6px;
+    top: -8px;
+    width: 118px;
+    height: 118px;
+}
+
+.nav-card:hover .nav-card-icon-analytics {
+    transform: rotate(-4deg) scale(1.03);
+}
+
+@media (max-width: 1050px) {
+    .dashboard-links {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
 }
 
 .button {
@@ -297,13 +316,13 @@ body {
     transform: translateY(0);
 }
 
-@media (max-width: 820px) {
+@media (max-width: 620px) {
     .dashboard-links {
         grid-template-columns: 1fr;
     }
 
     .nav-card {
-        min-height: 126px;
+        min-height: 148px;
     }
 }
 
