@@ -30,15 +30,27 @@ body {
 }
 
 .header-bar {
+    position: relative;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 12px 20px;
+    min-height: 76px;
+    padding: 10px 20px;
     background: var(--white);
     box-shadow: var(--shadow-sm);
     border-bottom: 2px solid var(--light-blue);
     border-radius: 0;
     margin: -20px -20px 30px;
+}
+
+.header-logo {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 66px;
+    height: 66px;
+    object-fit: contain;
+    transform: translate(-50%, -50%);
 }
 
 .button {
@@ -128,7 +140,7 @@ body {
     border-radius: 12px;
     box-shadow: var(--shadow-md);
     overflow: hidden;
-    margin-bottom: 24px;
+    margin: 0 auto 24px;
     max-width: 500px;
 }
 

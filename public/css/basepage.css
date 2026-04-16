@@ -28,21 +28,26 @@ body {
     min-height: 100vh;
 }
 
-.logo {
-    display: block;
-    max-width: 108px;
-    height: auto;
-    margin: 22px auto 30px;
-}
-
 .header-bar {
+    position: relative;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 12px 40px;
+    min-height: 76px;
+    padding: 10px 40px;
     background: var(--white);
     box-shadow: var(--shadow-sm);
     border-bottom: 2px solid var(--light-blue);
+}
+
+.header-logo {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 66px;
+    height: 66px;
+    object-fit: contain;
+    transform: translate(-50%, -50%);
 }
 
 .logout-btn {
