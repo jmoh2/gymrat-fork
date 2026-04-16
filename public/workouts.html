@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Workout Input and Tracker</title>
     <link rel="stylesheet" href="css/workout.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <div class="header-bar">
@@ -119,21 +118,6 @@
         </table>
     </div>
 
-
-     <!-- CHART CARD -->
-<div class="chart-card">
-    <div class="chart-controls">
-            <button class="chart-button" onclick="switchChart('bar')">Bar</button>
-            <button class="chart-button" onclick="switchChart('line')">Line</button>
-        </div>
-    <div class="chart-area">
-        <canvas id="workoutChart"></canvas>
-     </div>
-</div>
-
-
-<br><br>
-
     <!-- Filter for Table -->
     <div class="filter-container">
 
@@ -217,7 +201,10 @@
 
 <!-- Actual Table for Past Workouts -->
     <div class="card">
-        <h3>Past Workouts</h3>
+        <div class="card-title-row">
+            <h3>Past Workouts</h3>
+            <a href="analytics.html" class="tablebutton analytics-link-button">Go to Analytics</a>
+        </div>
 
         <table id="workoutTable">
             <thead>

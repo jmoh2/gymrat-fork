@@ -142,6 +142,7 @@ async function protectHtmlPages(req, res, next) {
         '/basepage.html',
         '/dashboard',
         '/dashboard.html',
+        '/analytics.html',
         '/userprofile.html',
         '/workouts.html',
         '/caloriemacro.html'
