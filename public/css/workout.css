@@ -92,23 +92,17 @@ body {
 }
 
 .suggestionCard {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    background: var(--white);
-    border-left: 4px solid var(--accent-green);
-    border-radius: 8px;
-    padding: 16px;
-    max-width: 320px;
+    background: #f0fff4;
+    border: 1px solid #a8d5b5;
+    border-radius: 10px;
+    padding: 14px 18px;
     font-size: 14px;
-    box-shadow: var(--shadow-lg);
-    z-index: 999;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
 }
 
 .suggestionCard strong {
-    color: var(--primary-blue);
-    display: block;
-    margin-bottom: 8px;
+    color: var(--text-dark);
 }
 
 .goal-card {
@@ -265,14 +259,43 @@ input {
 .checkbox-row {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
     min-height: 42px;
 }
 
 .checkbox-row input[type="checkbox"] {
-    width: 40px;
-    height: 18px;
-    transform: scale(1.2);
+    appearance: none;
+    -webkit-appearance: none;
+    flex: 0 0 auto;
+    width: 31px;
+    height: 31px;
+    margin: 0;
+    padding: 0;
+    background-color: transparent;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2.4l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 17.2l-5.8 3.1 1.1-6.5-4.7-4.6 6.5-.9L12 2.4z' fill='none' stroke='%238f97a3' stroke-width='2' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 28px 28px;
+    border: none;
+    border-radius: 0;
+    cursor: pointer;
+    transform: none;
+    transition: background-image 0.2s ease, transform 0.2s ease, filter 0.2s ease;
+}
+
+.checkbox-row input[type="checkbox"]:checked {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2.4l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 17.2l-5.8 3.1 1.1-6.5-4.7-4.6 6.5-.9L12 2.4z' fill='%23d4a017' stroke='%23d4a017' stroke-width='2' stroke-linejoin='round'/%3E%3C/svg%3E");
+    filter: drop-shadow(0 2px 4px rgba(212, 160, 23, 0.28));
+}
+
+.checkbox-row input[type="checkbox"]:hover {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2.4l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 17.2l-5.8 3.1 1.1-6.5-4.7-4.6 6.5-.9L12 2.4z' fill='%23d4a017' stroke='%23d4a017' stroke-width='2' stroke-linejoin='round'/%3E%3C/svg%3E");
+    transform: translateY(-1px);
+}
+
+.checkbox-row input[type="checkbox"]:focus-visible {
+    outline: 3px solid rgba(30, 90, 150, 0.25);
+    outline-offset: 4px;
 }
 
 .checkbox-row span {

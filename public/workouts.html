@@ -17,17 +17,18 @@
     function goHome() {window.location.href = '/basepage';}
     </script>
 
-    <div id="suggestionCard" class="suggestionCard">
-    <strong>Suggested Workouts</strong>
-<div id="suggestionContent" style="margin-top: 12px; display: flex; flex-direction: column; gap: 8px;"></div>    <button id="logSuggestionButton" style="margin-top: 12px; width: 100%;" class="button">Log Selected Workout</button>
-    <p id="suggestionResult" style="font-size: 12px; margin-top: 6px; color: green;"></p>
-</div>
-
     <h1 id="workoutHeader" class="user-message">Workout Input and History</h1>
 
 <div id="goalCard" class="goal-card" style="display: none;">
     <span class="goal-label">Current Goal:</span>
     <span id="currentGoal"></span>
+</div>
+
+<div id="suggestionCard" class="suggestionCard">
+    <strong>Suggested Workouts</strong>
+    <div id="suggestionContent" style="margin-top: 8px; display: flex; flex-direction: row; gap: 12px;"></div>
+    <button id="logSuggestionButton" style="margin-top: 10px;" class="button">Log Selected Workout</button>
+    <p id="suggestionResult" style="font-size: 12px; margin-top: 6px; color: green;"></p>
 </div>
 
 
@@ -86,9 +87,9 @@
 </div>
 
 <div class="form-group favorite-toggle">
-    <label for="favoriteWorkout">Favorite Workout:</label>
+    <label>Favorite Workout:</label>
     <div class="checkbox-row">
-        <input type="checkbox" id="favoriteWorkout" name="favoriteWorkout">
+        <input type="checkbox" id="favoriteWorkout" name="favoriteWorkout" aria-label="Save this workout to favorites">
         <span>Save this workout to favorites</span>
     </div>
 </div>

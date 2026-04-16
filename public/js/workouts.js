@@ -398,7 +398,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const workoutList = Array.isArray(suggestions) ? suggestions : [suggestions];
 
     content.innerHTML = workoutList.map((workout, index) => `
-    <div style="display: flex; align-items: flex-start; gap: 6px; padding: 10px; border: 1px solid #c0c8f0; border-radius: 8px; background: #fff;">
+    <div style="flex: 1; display: flex; align-items: flex-start; gap: 6px; padding: 10px; border: 1px solid #c8e6c9; border-radius: 8px; background: #fff;">
         <input type="checkbox" id="workoutCheck_${index}" style="margin-top: 3px; flex-shrink: 0; width: 12px; height: 12px;">
         <label for="workoutCheck_${index}" style="cursor: pointer; font-size: 12px; line-height: 1.4;">
             <b>${workout.workout_name}</b><br>
