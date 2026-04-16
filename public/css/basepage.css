@@ -1,6 +1,7 @@
 :root {
     --primary-blue: #1e5a96;
     --secondary-blue: #2e7bb4;
+    --title-outline-blue: #1e5a96;
     --light-blue: #e8f4f8;
     --accent-green: #27a745;
     --light-green: #e8f5e9;
@@ -103,20 +104,49 @@ body {
 }
 
 .container {
+    position: relative;
     background: var(--white);
     padding: 32px;
     border-radius: 12px;
     box-shadow: var(--shadow-md);
+    overflow: hidden;
     width: 90%;
     max-width: 900px;
     margin: 30px auto;
 }
 
-.container h2 {
+.container::before, .progress-graph::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 6px;
+    background: var(--primary-blue);
+    border-radius: 12px 0 0 12px;
+    z-index: 2;
+    pointer-events: none;
+}
+
+.container h2, .progress-graph h1 {
+    display: inline-flex;
+    align-items: center;
+    width: fit-content;
+    position: relative;
     color: var(--primary-blue);
-    margin-bottom: 24px;
-    font-size: 24px;
+    background:
+        linear-gradient(90deg, #ffffff 0%, #f7fbfc 72%, #e8f5e9 100%) padding-box,
+        linear-gradient(90deg, var(--title-outline-blue), var(--accent-green)) border-box;
+    border: 4px solid transparent;
+    border-radius: 0 999px 999px 0;
+    padding: 17px 82px 17px 41px;
+    margin: 6px 0 30px -39px;
+    font-size: 26px;
     font-weight: 700;
+    line-height: 1.15;
+    white-space: nowrap;
+    letter-spacing: 0.2px;
+    z-index: 1;
 }
 
 .header {
@@ -185,20 +215,15 @@ body {
 }
 
 .progress-graph {
+    position: relative;
     background: var(--white);
     padding: 32px;
     border-radius: 12px;
     box-shadow: var(--shadow-md);
+    overflow: hidden;
     width: 90%;
     max-width: 900px;
     margin: 0 auto 40px;
-    border-left: 4px solid var(--primary-blue);
-}
-
-.progress-graph h1 {
-    color: var(--primary-blue);
-    font-size: 20px;
-    font-weight: 700;
 }
 
 img {

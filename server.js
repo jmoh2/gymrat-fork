@@ -57,6 +57,17 @@ function getLocalDateForSql() {
     return `${year}-${month}-${day}`;
 }
 
+function formatUserNameFromEmail(email) {
+    const emailName = email.split('@')[0];
+
+    return emailName
+        .replace(/[._-]+/g, ' ')
+        .split(' ')
+        .filter(Boolean)
+        .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+        .join(' ');
+}
+
 // **Authorization Middleware: Verify JWT Token and Check User in Database**
 async function authenticateToken(req, res, next) {
     const token = req.headers['authorization'];
@@ -343,7 +354,7 @@ app.get('/api/user-name', authenticateToken, async (req, res) => {
             return res.status(404).json({ message: 'User not found.' });
         }
 
-        const userName = rows[0].email.split('@')[0];  // Extract name before '@' symbol
+        const userName = formatUserNameFromEmail(rows[0].email);
         res.status(200).json({ name: userName });
     } catch (error) {
         console.error(error);

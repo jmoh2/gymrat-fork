@@ -1,6 +1,7 @@
 :root {
     --primary-blue: #1e5a96;
     --secondary-blue: #2e7bb4;
+    --title-outline-blue: #1e5a96;
     --light-blue: #e8f4f8;
     --accent-green: #27a745;
     --light-green: #e8f5e9;
@@ -64,6 +65,20 @@ body {
     transform: translateY(0);
 }
 
+.header-bar .button {
+    position: relative;
+    min-width: 104px;
+    padding: 13px 28px 13px 38px;
+    background: linear-gradient(135deg, #d64545 0%, #b91c1c 100%);
+    border-radius: 0 10px 10px 0;
+    clip-path: polygon(22px 0, 100% 0, 100% 100%, 22px 100%, 0 50%);
+    font-size: 16px;
+}
+
+.header-bar .button:hover {
+    background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
+}
+
 .user-message {
     background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
     color: var(--white);
@@ -100,19 +115,48 @@ body {
 }
 
 .container {
+    position: relative;
     background: var(--white);
     padding: 24px;
     border-radius: 12px;
     box-shadow: var(--shadow-md);
+    overflow: hidden;
     margin-bottom: 24px;
     max-width: 500px;
 }
 
-.container h3 {
+.container::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 6px;
+    background: var(--primary-blue);
+    border-radius: 12px 0 0 12px;
+    z-index: 2;
+    pointer-events: none;
+}
+
+.container h2, .container h3 {
+    display: inline-flex;
+    align-items: center;
+    width: fit-content;
+    position: relative;
     color: var(--primary-blue);
-    margin-bottom: 20px;
+    background:
+        linear-gradient(90deg, #ffffff 0%, #f7fbfc 72%, #e8f5e9 100%) padding-box,
+        linear-gradient(90deg, var(--title-outline-blue), var(--accent-green)) border-box;
+    border: 3px solid transparent;
+    border-radius: 0 999px 999px 0;
+    padding: 11px 51px 11px 39px;
+    margin: 6px 0 28px -30px;
     font-size: 18px;
     font-weight: 700;
+    line-height: 1.15;
+    white-space: nowrap;
+    letter-spacing: 0.2px;
+    z-index: 1;
 }
 
 .container > div {
@@ -149,6 +193,10 @@ input::placeholder {
     color: var(--text-light);
 }
 
+input, select {
+    margin-bottom: 6px;
+}
+
 select {
     appearance: none;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%231e5a96' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
@@ -174,6 +222,11 @@ select {
 .container button:hover {
     transform: translateY(-2px);
     box-shadow: var(--shadow-lg);
+}
+
+#result {
+    color: var(--accent-green);
+    font-weight: 600;
 }
 
 table {
