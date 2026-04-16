@@ -1,7 +1,6 @@
 document.addEventListener('DOMContentLoaded', async () => {
-    const token = localStorage.getItem('jwtToken');
+    const token = await requireAuthenticatedPage();
     if (!token) {
-        window.location.href = '/';
         return;
     }
 

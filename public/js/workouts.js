@@ -239,10 +239,9 @@ function clearFilters() {
     applyFilters();
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-    const token = localStorage.getItem("jwtToken");
+document.addEventListener("DOMContentLoaded", async () => {
+    const token = await requireAuthenticatedPage();
     if (!token) {
-        window.location.href = "/";
         return;
     }
 
