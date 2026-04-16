@@ -37,8 +37,8 @@ body {
     background: var(--white);
     box-shadow: var(--shadow-sm);
     border-bottom: 2px solid var(--light-blue);
-    border-radius: 8px;
-    margin-bottom: 30px;
+    border-radius: 0;
+    margin: -20px -20px 30px;
 }
 
 .button {
