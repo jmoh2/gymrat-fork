@@ -23,17 +23,32 @@
     <span id="currentGoal"></span>
 </div>
 
-<div id="suggestionCard" class="suggestionCard">
-    <strong>Suggested Workouts</strong>
-    <div id="suggestionContent" style="margin-top: 8px; display: flex; flex-direction: row; gap: 12px;"></div>
-    <button id="logSuggestionButton" style="margin-top: 10px;" class="button">Log Selected Workout</button>
-    <p id="suggestionResult" style="font-size: 12px; margin-top: 6px; color: green;"></p>
+<div id="suggestionCard" class="suggestionCard collapsible-card">
+    <div class="collapsible-card-header suggestion-card-title-row">
+        <strong>Suggested Workouts</strong>
+        <button type="button" class="collapse-toggle" aria-expanded="true">
+            <span class="collapse-toggle-icon" aria-hidden="true">−</span>
+            <span class="collapse-toggle-text">Minimize</span>
+        </button>
+    </div>
+    <div class="collapsible-card-content">
+        <div id="suggestionContent" style="margin-top: 8px; display: flex; flex-direction: row; gap: 12px;"></div>
+        <button id="logSuggestionButton" style="margin-top: 10px;" class="button">Log Selected Workout</button>
+        <p id="suggestionResult" style="font-size: 12px; margin-top: 6px; color: green;"></p>
+    </div>
 </div>
 
 
 <!-- workout inputs -->
-    <div class="container">
-    <h3>New Workout Input</h3>
+    <div class="container collapsible-card">
+    <div class="collapsible-card-header card-title-row">
+        <h3>New Workout Input</h3>
+        <button type="button" class="collapse-toggle" aria-expanded="true">
+            <span class="collapse-toggle-icon" aria-hidden="true">−</span>
+            <span class="collapse-toggle-text">Minimize</span>
+        </button>
+    </div>
+    <div class="collapsible-card-content form-card-content">
 
     <div class="form-group quarter">
     <label for="workoutName">Workout Name:</label>
@@ -95,12 +110,20 @@
     
     <button id="submit" class="inputsubmit-button">Submit</button>
 
+    </div>
 </div>
 
 <!-- favorite workouts table -->
-    <div class="card">
-        <h3>Favorite Workouts</h3>
+    <div class="card collapsible-card">
+        <div class="collapsible-card-header card-title-row">
+            <h3>Favorite Workouts</h3>
+            <button type="button" class="collapse-toggle" aria-expanded="true">
+                <span class="collapse-toggle-icon" aria-hidden="true">−</span>
+                <span class="collapse-toggle-text">Minimize</span>
+            </button>
+        </div>
 
+        <div class="collapsible-card-content">
         <table id="favoriteWorkoutTable">
             <thead>
                 <tr>
@@ -116,12 +139,20 @@
             </thead>
             <tbody></tbody>
         </table>
+        </div>
     </div>
 
     <!-- Filter for Table -->
-    <div class="filter-container">
+    <div class="filter-container collapsible-card">
 
-    <h3>Filter for Table</h3>
+    <div class="collapsible-card-header card-title-row">
+        <h3>Filter for Table</h3>
+        <button type="button" class="collapse-toggle" aria-expanded="true">
+            <span class="collapse-toggle-icon" aria-hidden="true">−</span>
+            <span class="collapse-toggle-text">Minimize</span>
+        </button>
+    </div>
+    <div class="collapsible-card-content filter-card-content">
 
     <div class="form-group">
     <label for="dateFrom">From:</label>
@@ -196,16 +227,24 @@
     <button id="refreshButton" class="tablebutton">Refresh Table</button>
     </div>
 
+    </div>
 </div>
 
 
 <!-- Actual Table for Past Workouts -->
-    <div class="card">
-        <div class="card-title-row">
-            <h3>Past Workouts</h3>
-            <a href="analytics.html" class="tablebutton analytics-link-button">Go to Analytics</a>
+    <div class="card collapsible-card">
+        <div class="collapsible-card-header card-title-row">
+            <div class="card-title-actions">
+                <h3>Past Workouts</h3>
+                <a href="analytics.html" class="tablebutton analytics-link-button">Go to Analytics</a>
+            </div>
+            <button type="button" class="collapse-toggle" aria-expanded="true">
+                <span class="collapse-toggle-icon" aria-hidden="true">−</span>
+                <span class="collapse-toggle-text">Minimize</span>
+            </button>
         </div>
 
+        <div class="collapsible-card-content">
         <table id="workoutTable">
             <thead>
                 <tr>
@@ -222,6 +261,7 @@
             </thead>
             <tbody></tbody>
         </table>
+        </div>
     </div>
 
     <div id="deleteWorkoutModal" class="confirm-modal hidden">
@@ -243,6 +283,7 @@
 
     <script src="/js/datamodel.js"></script>
     <script src="/js/auth.js"></script>
+    <script src="/js/collapsibleCards.js"></script>
     <script src="/js/workouts.js"></script>
 
 </body>

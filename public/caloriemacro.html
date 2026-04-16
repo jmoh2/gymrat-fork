@@ -26,23 +26,30 @@
 
   
 <!-- Suggested Meal Card -->
-<div id="mealSuggestionCard" style="
-    background: #f0fff4;
-    border: 1px solid #a8d5b5;
-    border-radius: 10px;
-    padding: 14px 18px;
-    font-size: 14px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    margin-bottom: 20px;
-">
-    <strong>Suggested Meals</strong>
-    <div id="mealSuggestionContent" style="margin-top: 8px; display: flex; flex-direction: row; gap: 12px;"></div>
-    <button class = "button" id="logMealSuggestionButton" style="margin-top: 10px;">Log Selected Meal</button>
-    <p id="mealSuggestionResult" style="font-size: 12px; margin-top: 6px; color: green;"></p>
+<div id="mealSuggestionCard" class="suggestionCard collapsible-card">
+    <div class="collapsible-card-header suggestion-card-title-row">
+        <strong>Suggested Meals</strong>
+        <button type="button" class="collapse-toggle" aria-expanded="true">
+            <span class="collapse-toggle-icon" aria-hidden="true">−</span>
+            <span class="collapse-toggle-text">Minimize</span>
+        </button>
+    </div>
+    <div class="collapsible-card-content">
+        <div id="mealSuggestionContent" style="margin-top: 8px; display: flex; flex-direction: row; gap: 12px;"></div>
+        <button class = "button" id="logMealSuggestionButton" style="margin-top: 10px;">Log Selected Meal</button>
+        <p id="mealSuggestionResult" style="font-size: 12px; margin-top: 6px; color: green;"></p>
+    </div>
 </div>
 
-<div class="container">
-    <h3>Input Meal Data</h3>
+<div class="container collapsible-card">
+    <div class="collapsible-card-header card-title-row">
+        <h3>Input Meal Data</h3>
+        <button type="button" class="collapse-toggle" aria-expanded="true">
+            <span class="collapse-toggle-icon" aria-hidden="true">−</span>
+            <span class="collapse-toggle-text">Minimize</span>
+        </button>
+    </div>
+    <div class="collapsible-card-content form-card-content">
 
     <div class="form-group">
     <label for="mealDate">Date:</label>
@@ -94,14 +101,22 @@
 </div>
 
     <button id="addMealButton" type="button" class="tablebutton">Add Meal</button>
+    </div>
 </div>
 
 <br>
 
 <!-- FAVORITE MEALS PORTION -->
-<div class="card">
-    <h3>Favorite Meals</h3>
+<div class="card collapsible-card">
+    <div class="collapsible-card-header card-title-row">
+        <h3>Favorite Meals</h3>
+        <button type="button" class="collapse-toggle" aria-expanded="true">
+            <span class="collapse-toggle-icon" aria-hidden="true">−</span>
+            <span class="collapse-toggle-text">Minimize</span>
+        </button>
+    </div>
 
+    <div class="collapsible-card-content">
     <table id="favoriteMealTable">
         <thead>
             <tr>
@@ -117,11 +132,19 @@
         </thead>
         <tbody></tbody>
     </table>
+    </div>
 </div>
 
 <!-- FILTER PORTION -->
-<div class="filter-container">
-<h3>Filter for Table</h3>
+<div class="filter-container collapsible-card">
+<div class="collapsible-card-header card-title-row">
+    <h3>Filter for Table</h3>
+    <button type="button" class="collapse-toggle" aria-expanded="true">
+        <span class="collapse-toggle-icon" aria-hidden="true">−</span>
+        <span class="collapse-toggle-text">Minimize</span>
+    </button>
+</div>
+<div class="collapsible-card-content filter-card-content">
 
     <div class="form-group">
     <label for="dateFrom">From:</label>
@@ -196,16 +219,24 @@
     </div>
 
 </div>
+</div>
 
 
 
 <!-- Actual Table for Past Meals -->
-<div class="card">
-    <div class="card-title-row">
-        <h3>Past Meals</h3>
-        <a href="analytics.html" class="tablebutton analytics-link-button">Go to Analytics</a>
+<div class="card collapsible-card">
+    <div class="collapsible-card-header card-title-row">
+        <div class="card-title-actions">
+            <h3>Past Meals</h3>
+            <a href="analytics.html" class="tablebutton analytics-link-button">Go to Analytics</a>
+        </div>
+        <button type="button" class="collapse-toggle" aria-expanded="true">
+            <span class="collapse-toggle-icon" aria-hidden="true">−</span>
+            <span class="collapse-toggle-text">Minimize</span>
+        </button>
     </div>
 
+    <div class="collapsible-card-content">
     <table id="mealTable">
         <thead>
             <tr>
@@ -222,6 +253,7 @@
         </thead>
         <tbody></tbody>
     </table>
+    </div>
 </div>
 
 <div id="deleteMealModal" class="confirm-modal hidden">
@@ -238,6 +270,7 @@
 
     <script src="/js/datamodel.js"></script>
     <script src="/js/auth.js"></script>
+    <script src="/js/collapsibleCards.js"></script>
     <script src="/js/caloriemacro.js"></script>
 </body>
 </html>
