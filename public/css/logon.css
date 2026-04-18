@@ -87,6 +87,12 @@ body {
 
 .tab-button:hover:not(.active) {
     color: var(--primary-blue);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-sm);
+}
+
+.tab-button:active {
+    transform: translateY(0);
 }
 
 form {

@@ -10,6 +10,7 @@
 <body>
     <div class="header-bar">
         <div></div>
+        <img src="./logos/GymRat.png" class="header-logo" alt="GymRat Logo">
         <button id="logoutButton" class="logout-btn">Logout</button>
     </div>
 
@@ -17,22 +18,67 @@
         This looks like an older account, so some profile details may be missing. Please visit User Profile to finish setting up your account.
     </div>
 
-    <img src="./logos/GymRat.png" class="logo" alt="GymRat Logo">
-
     <div class="welcome-message">
         <h1 id="welcomeHeading"></h1>
         <p>Your personal fitness companion.</p>
     </div>
 
-
-    <div class="container">
-        <div class="header">
-            <h2>Dashboard</h2>
-        <a href="userprofile.html" class="button">User Profile</a>
-        <a href="workouts.html" class="button">Workout Input/Tracker</a>
-        <a href="caloriemacro.html" class="button">Calorie and Macro Input/Tracker</a>
-        </div>
-    </div>
+    <nav class="dashboard-links" aria-label="Dashboard navigation">
+        <a href="workouts.html" class="nav-card">
+            <span class="nav-card-text">
+                <span class="nav-card-title">Workouts</span>
+                <span class="nav-card-description">Log training, favorites, and activity history</span>
+            </span>
+            <svg class="nav-card-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path d="M3 9.5v5"></path>
+                <path d="M5.5 7.5v9"></path>
+                <path d="M8 10.5v3"></path>
+                <path d="M8 12h8"></path>
+                <path d="M16 10.5v3"></path>
+                <path d="M18.5 7.5v9"></path>
+                <path d="M21 9.5v5"></path>
+            </svg>
+        </a>
+        <a href="caloriemacro.html" class="nav-card">
+            <span class="nav-card-text">
+                <span class="nav-card-title">Meals</span>
+                <span class="nav-card-description">Track calories, macros, and favorite meals</span>
+            </span>
+            <svg class="nav-card-icon nav-card-icon-meals" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path d="M6.2 10.2c-.4-2.4 1.2-4.4 3.4-4.2.9-2 3.9-2 4.8 0 2.2-.2 3.8 1.8 3.4 4.2"></path>
+                <path d="M6.6 10.2h10.8l-1.2 9.2H7.8l-1.2-9.2Z"></path>
+                <path d="M8.3 13.1h7.4"></path>
+                <path d="M8.9 16h6.2"></path>
+                <path d="M10.2 7.9h.1"></path>
+                <path d="M13.9 7.7h.1"></path>
+            </svg>
+        </a>
+        <a href="analytics.html" class="nav-card">
+            <span class="nav-card-text">
+                <span class="nav-card-title">Analytics</span>
+                <span class="nav-card-description">Review trends, progress, and patterns</span>
+            </span>
+            <svg class="nav-card-icon nav-card-icon-analytics" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path d="M4 19V5"></path>
+                <path d="M4 19h16"></path>
+                <path d="M7 15l3-4 3 2 4-7"></path>
+                <path d="M7 15h.1"></path>
+                <path d="M10 11h.1"></path>
+                <path d="M13 13h.1"></path>
+                <path d="M17 6h.1"></path>
+            </svg>
+        </a>
+        <a href="userprofile.html" class="nav-card">
+            <span class="nav-card-text">
+                <span class="nav-card-title">Profile Settings</span>
+                <span class="nav-card-description">Update goals, stats, and preferences</span>
+            </span>
+            <svg class="nav-card-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path d="M12 15.5A3.5 3.5 0 1 0 12 8a3.5 3.5 0 0 0 0 7.5Z"></path>
+                <path d="M19.4 13.5c.1-.5.1-1 .1-1.5s0-1-.1-1.5l2-1.5-2-3.5-2.4 1a8.8 8.8 0 0 0-2.6-1.5L14 2h-4l-.4 2.5A8.8 8.8 0 0 0 7 6L4.6 5l-2 3.5 2 1.5c-.1.5-.1 1-.1 1.5s0 1 .1 1.5l-2 1.5 2 3.5 2.4-1a8.8 8.8 0 0 0 2.6 1.5L10 22h4l.4-2.5A8.8 8.8 0 0 0 17 18l2.4 1 2-3.5-2-1.5Z"></path>
+            </svg>
+        </a>
+    </nav>
 
     <div class="dashboard">
         <div class="dashboard-item">
@@ -79,7 +125,8 @@
 </div>
 
 
-    <script src="/js/basepage.js"></script>
     <script src="/js/datamodel.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/basepage.js"></script>
 </body>
 </html>

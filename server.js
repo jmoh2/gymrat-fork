@@ -10,7 +10,9 @@ const port = 3000;
 // Middleware to parse JSON bodies
 app.use(express.json());
 
-// Serve static files from the "public" folder
+app.use(protectHtmlPages);
+
+// Serve static files from the "public" folder after protected page checks
 app.use(express.static('public'));
 
 //////////////////////////////////////
@@ -57,42 +59,125 @@ function getLocalDateForSql() {
     return `${year}-${month}-${day}`;
 }
 
-// **Authorization Middleware: Verify JWT Token and Check User in Database**
-async function authenticateToken(req, res, next) {
-    const token = req.headers['authorization'];
+function formatUserNameFromEmail(email) {
+    const emailName = email.split('@')[0];
 
-    if (!token) {
-        return res.status(401).json({ message: 'Access denied. No token provided.' });
+    return emailName
+        .replace(/[._-]+/g, ' ')
+        .split(' ')
+        .filter(Boolean)
+        .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+        .join(' ');
+}
+
+function getCookieValue(req, name) {
+    const cookieHeader = req.headers.cookie;
+
+    if (!cookieHeader) {
+        return null;
     }
 
-    jwt.verify(token, process.env.JWT_SECRET, async (err, decoded) => {
-        if (err) {
-            return res.status(403).json({ message: 'Invalid token.' });
-        }
+    const cookies = cookieHeader.split(';').map((cookie) => cookie.trim());
+    const targetCookie = cookies.find((cookie) => cookie.startsWith(`${name}=`));
 
-        try {
-            const connection = await createConnection();
+    return targetCookie ? decodeURIComponent(targetCookie.split('=').slice(1).join('=')) : null;
+}
 
-            // Query the database to verify that the email is associated with an active account
-            const [rows] = await connection.execute(
-                'SELECT email FROM user WHERE email = ?',
-                [decoded.email]
-            );
+function getTokenFromRequest(req) {
+    return req.headers.authorization || getCookieValue(req, 'jwtToken');
+}
 
-            await connection.end();  // Close connection
-
-            if (rows.length === 0) {
-                return res.status(403).json({ message: 'Account not found or deactivated.' });
+function verifyJwtToken(token) {
+    return new Promise((resolve, reject) => {
+        jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+            if (err) {
+                reject(err);
+                return;
             }
 
-            req.user = decoded;  // Save the decoded email for use in the route
-            next();  // Proceed to the next middleware or route handler
-        } catch (dbError) {
-            console.error(dbError);
-            res.status(500).json({ message: 'Database error during authentication.' });
-        }
+            resolve(decoded);
+        });
     });
-    
+}
+
+async function getAuthenticatedUser(token) {
+    if (!token) {
+        const error = new Error('Access denied. No token provided.');
+        error.statusCode = 401;
+        throw error;
+    }
+
+    let decoded;
+
+    try {
+        decoded = await verifyJwtToken(token);
+    } catch (error) {
+        error.statusCode = 403;
+        throw error;
+    }
+
+    const connection = await createConnection();
+
+    try {
+        const [rows] = await connection.execute(
+            'SELECT email FROM user WHERE email = ?',
+            [decoded.email]
+        );
+
+        if (rows.length === 0) {
+            const error = new Error('Account not found or deactivated.');
+            error.statusCode = 403;
+            throw error;
+        }
+
+        return decoded;
+    } finally {
+        await connection.end();
+    }
+}
+
+async function protectHtmlPages(req, res, next) {
+    const protectedPagePaths = new Set([
+        '/basepage',
+        '/basepage.html',
+        '/dashboard',
+        '/dashboard.html',
+        '/analytics.html',
+        '/userprofile.html',
+        '/workouts.html',
+        '/caloriemacro.html'
+    ]);
+
+    if (req.method !== 'GET' || !protectedPagePaths.has(req.path)) {
+        next();
+        return;
+    }
+
+    try {
+        await getAuthenticatedUser(getTokenFromRequest(req));
+        next();
+    } catch (error) {
+        res.redirect('/');
+    }
+}
+
+// **Authorization Middleware: Verify JWT Token and Check User in Database**
+async function authenticateToken(req, res, next) {
+    try {
+        req.user = await getAuthenticatedUser(getTokenFromRequest(req));
+        next();
+    } catch (error) {
+        if (error.statusCode === 401) {
+            return res.status(401).json({ message: 'Access denied. No token provided.' });
+        }
+
+        if (error.statusCode === 403) {
+            return res.status(403).json({ message: error.message || 'Invalid token.' });
+        }
+
+        console.error(error);
+        res.status(500).json({ message: 'Database error during authentication.' });
+    }
 }
 /////////////////////////////////////////////////
 //END HELPER FUNCTIONS AND AUTHENTICATION MIDDLEWARE
@@ -206,11 +291,30 @@ app.post('/api/login', async (req, res) => {
             { expiresIn: '1h' }
         );
 
+        res.cookie('jwtToken', token, {
+            httpOnly: true,
+            sameSite: 'lax',
+            maxAge: 60 * 60 * 1000
+        });
+
         res.status(200).json({ token });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Error logging in.' });
     }
+});
+
+app.post('/api/logout', (req, res) => {
+    res.clearCookie('jwtToken', {
+        httpOnly: true,
+        sameSite: 'lax'
+    });
+
+    res.status(200).json({ message: 'Logged out successfully.' });
+});
+
+app.get('/api/auth-check', authenticateToken, (req, res) => {
+    res.status(200).json({ authenticated: true });
 });
 
 // Route: Send meal data (Protected Route)
@@ -343,7 +447,7 @@ app.get('/api/user-name', authenticateToken, async (req, res) => {
             return res.status(404).json({ message: 'User not found.' });
         }
 
-        const userName = rows[0].email.split('@')[0];  // Extract name before '@' symbol
+        const userName = formatUserNameFromEmail(rows[0].email);
         res.status(200).json({ name: userName });
     } catch (error) {
         console.error(error);
