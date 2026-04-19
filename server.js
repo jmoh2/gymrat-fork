@@ -1023,6 +1023,86 @@ app.get('/api/meal-count', authenticateToken, async (req, res) => {
     }
 });
 
+// Route: Average Protein Intake Per Meal
+app.get('/api/average-protein-per-meal', authenticateToken, async (req, res) => {
+    try {
+        const connection = await createConnection();
+        const [result] = await connection.execute(
+            `SELECT AVG(protein) AS average_protein
+             FROM meals
+             WHERE user_id = (SELECT user_id FROM user WHERE email = ?)`,
+            [req.user.email]
+        );
+        await connection.end();
+
+        const averageProtein = result[0].average_protein || 0;
+        res.status(200).json({ average: averageProtein });
+    } catch (error) {
+        console.error('DB ERROR:', error);
+        res.status(500).json({ message: 'Error retrieving average protein per meal.' });
+    }
+});
+
+// Route: Average fats Intake Per Meal
+app.get('/api/average-fats-per-meal', authenticateToken, async (req, res) => {
+    try {
+        const connection = await createConnection();
+        const [result] = await connection.execute(
+            `SELECT AVG(fats) AS average_fats
+             FROM meals
+             WHERE user_id = (SELECT user_id FROM user WHERE email = ?)`,
+            [req.user.email]
+        );
+        await connection.end();
+
+        const averageFats = result[0].average_fats || 0;
+        res.status(200).json({ average: averageFats });
+    } catch (error) {
+        console.error('DB ERROR:', error);
+        res.status(500).json({ message: 'Error retrieving average fats per meal.' });
+    }
+});
+
+// Route: Average carbs Intake Per Meal
+app.get('/api/average-carbs-per-meal', authenticateToken, async (req, res) => {
+    try {
+        const connection = await createConnection();
+        const [result] = await connection.execute(
+            `SELECT AVG(carbs) AS average_carbs
+             FROM meals
+             WHERE user_id = (SELECT user_id FROM user WHERE email = ?)`,
+            [req.user.email]
+        );
+        await connection.end();
+
+        const averageCarbs = result[0].average_carbs || 0;
+        res.status(200).json({ average: averageCarbs });
+    } catch (error) {
+        console.error('DB ERROR:', error);
+        res.status(500).json({ message: 'Error retrieving average carbs per meal.' });
+    }
+}); 
+
+// Route: Average calories intake per meal
+app.get('/api/average-calories-per-meal', authenticateToken, async (req, res) => {
+    try {
+        const connection = await createConnection();
+        const [result] = await connection.execute(
+            `SELECT AVG(calories) AS average_calories
+             FROM meals
+             WHERE user_id = (SELECT user_id FROM user WHERE email = ?)`,
+            [req.user.email]
+        );
+        await connection.end();
+
+        const averageCalories = result[0].average_calories || 0;
+        res.status(200).json({ average: averageCalories });
+    } catch (error) {
+        console.error('DB ERROR:', error);
+        res.status(500).json({ message: 'Error retrieving average calories per meal.' });
+    }
+});
+
 // Route: Get Calories Burned Today
 app.get('/api/calories-burned-today', authenticateToken, async (req, res) => {
     try {

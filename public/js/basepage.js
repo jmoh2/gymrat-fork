@@ -149,7 +149,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-        // Fetch calories consumed today
+    // Fetch calories consumed today
     async function caloriesConsumedToday() {
         const token = localStorage.getItem("jwtToken");
 
@@ -166,6 +166,74 @@ document.addEventListener('DOMContentLoaded', async () => {
             return 0;
         }
     }
+
+    //Fetch average protein per meals
+    async function averageProteinPerMeal() {
+        const token = localStorage.getItem("jwtToken");
+
+        try {
+            const res = await fetch('/api/average-protein-per-meal', {
+                headers: {
+                    "Authorization": token
+                }
+            });
+            const data = await res.json();
+            document.getElementById('avgProtein').textContent = Number(data.average).toFixed(2);
+        } catch (error) {
+            console.error('Error fetching average protein per meal:', error);
+        }
+    }
+
+    // Fetch average fats per meal
+    async function averageFatsPerMeal() {
+        const token = localStorage.getItem("jwtToken");
+
+        try {
+            const res = await fetch('/api/average-fats-per-meal', {
+                headers: {
+                    "Authorization": token
+                }
+            });
+            const data = await res.json();
+            document.getElementById('avgFats').textContent = Number(data.average).toFixed(2);
+        } catch (error) {
+            console.error('Error fetching average fats per meal:', error);
+        }
+    }
+
+    // Fetch average carbs per meal
+    async function averageCarbsPerMeal() {
+        const token = localStorage.getItem("jwtToken");
+
+        try {
+            const res = await fetch('/api/average-carbs-per-meal', {
+                headers: {
+                    "Authorization": token
+                }
+            });
+            const data = await res.json();
+            document.getElementById('avgCarbs').textContent = Number(data.average).toFixed(2);
+        } catch (error) {
+            console.error('Error fetching average carbs per meal:', error);
+        }
+    }
+
+    // Fetch average calories per meal
+    async function averageCaloriesPerMeal() {
+        const token = localStorage.getItem("jwtToken");
+
+        try {
+            const res = await fetch('/api/average-calories-per-meal', {
+                headers: {
+                    "Authorization": token
+                }
+            });
+            const data = await res.json();
+            document.getElementById('avgCalories').textContent = Number(data.average).toFixed(2);
+        } catch (error) {
+            console.error('Error fetching average calories per meal:', error);
+        }
+    } 
 
     // Calculate BMR using lbs and inches
     function calculateBMR(profile) {
@@ -285,6 +353,10 @@ async function getTargetCalories() {
     caloriesBurnedToday();
     activeDaysThisWeek();
     activeDaysThisMonth();
+    averageProteinPerMeal();
+    averageFatsPerMeal();
+    averageCarbsPerMeal();
+    averageCaloriesPerMeal();
     updateGoalProgress();
     // Fetch the user's name and display a welcome message based on username and span id welcomeMessage
     
