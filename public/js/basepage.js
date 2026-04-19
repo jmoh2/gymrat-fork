@@ -348,6 +348,83 @@ async function getTargetCalories() {
         }
     }
 
+
+    // Make sure user doesn't select more than 6 checkboxes at once in the dashboard settings
+    const checkboxes = document.querySelectorAll('.dashboard-item');
+    
+    checkboxes.forEach(box => {
+        box.addEventListener('change', () => {
+            const checked = document.querySelectorAll('.dashboard-item:checked');
+
+        if (checked.length > 6) {
+            box.checked = false; // undo the click
+            alert("You can only select up to 6 cards.");
+        }
+        });
+    });
+
+    // Update dashboard display based on selected checkboxes when "Update Dashboard" button is clicked
+    const updateBtn = document.getElementById('updateDashboardBtn');
+
+    if (updateBtn) {
+        updateBtn.addEventListener('click', () => {
+            const allCards = document.querySelectorAll('[id^="card-"]');
+            const checkedBoxes = document.querySelectorAll('.dashboard-item:checked');
+
+            const selected = [];
+            checkedBoxes.forEach(box => {
+                selected.push(box.value);
+            });
+            localStorage.setItem('dashboardSelection', JSON.stringify(selected));
+
+
+            allCards.forEach(card => {
+                card.style.display = 'none';
+            });
+
+            checkedBoxes.forEach(box => {
+                const cardId = box.value;
+                const card = document.getElementById(cardId);
+
+                if (card) {
+                    card.style.display = 'block';
+                }
+            });
+        });
+    }
+
+    // Initial dashboard setup based on saved preferences
+    function loadSavedDashboard() {
+        const saved = JSON.parse(localStorage.getItem('dashboardSelection'));
+
+        if (!saved) return;
+
+        const allCards = document.querySelectorAll('[id^="card-"]');
+        const checkboxes = document.querySelectorAll('.dashboard-item');
+
+        checkboxes.forEach(box => {
+            box.checked = false;
+        });
+
+        allCards.forEach(card => {
+            card.style.display = 'none';
+        });
+
+        saved.forEach(value => {
+            const checkbox = document.querySelector(`.dashboard-item[value="${value}"]`);
+            const card = document.getElementById(value);
+
+            if (checkbox) {
+                checkbox.checked = true;
+            }
+
+            if (card) {
+                card.style.display = 'block';
+            }
+        });
+    }
+
+    loadSavedDashboard();
     totalWorkoutCount();
     totalMealCount();
     caloriesBurnedToday();

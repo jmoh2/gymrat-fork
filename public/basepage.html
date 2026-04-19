@@ -83,72 +83,73 @@
     <h2>Select Cards to add:</h2>
     
     <label>
-        <input type="checkbox" id="totalWorkouts"> Total Workouts</input>
+    <input type="checkbox" class="dashboard-item" value="card-workouts"> Total Workouts
     </label>
     <label>
-        <input type="checkbox" id="caloriesBurned"> Calories Burned Today</input>
+        <input type="checkbox" class="dashboard-item" value="card-calories-burned"> Calories Burned Today
     </label>
     <label>
-        <input type="checkbox" id="totalMeals"> Total Meals</input>
+        <input type="checkbox" class="dashboard-item" value="card-total-meals"> Total Meals
     </label>
     <label>
-        <input type="checkbox" id="activeDays"> Active Days This Week</input>
+        <input type="checkbox" class="dashboard-item" value="card-active-days-week"> Active Days This Week
     </label>
     <label>
-        <input type="checkbox" id="ActiveDaysMonth"> Active Days This Month</input>
+        <input type="checkbox" class="dashboard-item" value="card-active-days-month"> Active Days This Month
     </label>
     <br>
     <label>
-        <input type="checkbox" id="AvgProtein"> Average Protein per Meal</input>
+        <input type="checkbox" class="dashboard-item" value="card-avg-protein"> Average Protein per Meal
     </label>
     <label>
-        <input type="checkbox" id="AvgFats"> Average Fats per Meal</input>
+        <input type="checkbox" class="dashboard-item" value="card-avg-fats"> Average Fats per Meal
     </label>
     <label>
-        <input type="checkbox" id="AvgCarbs"> Average Carbs per Meal</input>
+        <input type="checkbox" class="dashboard-item" value="card-avg-carbs"> Average Carbs per Meal
     </label>
     <label>
-        <input type="checkbox" id="AvgCalories"> Average Calories per Meal</input>
+        <input type="checkbox" class="dashboard-item" value="card-avg-calories"> Average Calories per Meal
     </label>
+    <button id="updateDashboardBtn" class="button">Update Dashboard</button>
     
 
-    <div class="dashboard">
-        <div class="dashboard-item">
-            <h3>Total Workouts</h3>
-            <p id="workoutCount">Loading...</p>
-        </div>
-        <div class="dashboard-item">
-            <h3>Calories Burned Today</h3>
-            <p id="calorieSummary">Loading...</p>
-        </div>
-        <div class="dashboard-item">
-            <h3>Total Meals</h3>
-            <p id="mealCount">Loading...</p>
-        </div>
-        <div class="dashboard-item">
-            <h3>Active Days this Week</h3>
-            <p id="activeDaysSummary">Loading...</p>
-        </div>
-        <div class="dashboard-item">
-            <h3>Active Days this Month</h3>
-            <p id="activeDaysMonth">Loading...</p>
-        </div>
-        <div class="dashboard-item">
-            <h3>Average Protein per Meal</h3>
-            <p id="avgProtein">Loading...</p>
-        </div>
-        <div class="dashboard-item">
-            <h3>Average Fats per Meal</h3>
-            <p id="avgFats">Loading...</p>
-        </div>
-        <div class="dashboard-item">
-            <h3>Average Carbs per Meal</h3>
-            <p id="avgCarbs">Loading...</p>
-        </div>
-        <div class="dashboard-item">
-            <h3>Average Calories per Meal</h3>
-            <p id="avgCalories">Loading...</p>
-        </div>
+   <div class="dashboard">
+    <div class="dashboard-item" id="card-workouts">
+        <h3>Total Workouts</h3>
+        <p id="workoutCount">Loading...</p>
+    </div>
+    <div class="dashboard-item" id="card-calories-burned">
+        <h3>Calories Burned Today</h3>
+        <p id="calorieSummary">Loading...</p>
+    </div>
+    <div class="dashboard-item" id="card-total-meals">
+        <h3>Total Meals</h3>
+        <p id="mealCount">Loading...</p>
+    </div>
+    <div class="dashboard-item" id="card-active-days-week">
+        <h3>Active Days this Week</h3>
+        <p id="activeDaysSummary">Loading...</p>
+    </div>
+    <div class="dashboard-item" id="card-active-days-month">
+        <h3>Active Days this Month</h3>
+        <p id="activeDaysMonth">Loading...</p>
+    </div>
+    <div class="dashboard-item" id="card-avg-protein">
+        <h3>Average Protein per Meal</h3>
+        <p id="avgProtein">Loading...</p>
+    </div>
+    <div class="dashboard-item" id="card-avg-fats">
+        <h3>Average Fats per Meal</h3>
+        <p id="avgFats">Loading...</p>
+    </div>
+    <div class="dashboard-item" id="card-avg-carbs">
+        <h3>Average Carbs per Meal</h3>
+        <p id="avgCarbs">Loading...</p>
+    </div>
+    <div class="dashboard-item" id="card-avg-calories">
+        <h3>Average Calories per Meal</h3>
+        <p id="avgCalories">Loading...</p>
+    </div>
     </div>
 
     <div class="progress-graph">
