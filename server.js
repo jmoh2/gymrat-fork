@@ -997,6 +997,33 @@ app.get('/api/active-days-this-week', authenticateToken, async (req, res) => {
         res.status(500).json({ message: 'Error retrieving active days this week.' });
     }
 });
+
+// Route: Get Active Days This Month
+app.get('/api/active-days-this-month', authenticateToken, async (req, res) => {
+    try {
+        const connection = await createConnection();
+        const today = new Date();
+
+        const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1).toISOString().split('T')[0];
+        const endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0).toISOString().split('T')[0];
+
+        const [result] = await connection.execute(
+            `SELECT COUNT(DISTINCT workout_date) AS active_days
+             FROM workouts
+             WHERE user_id = (SELECT user_id FROM user WHERE email = ?)
+             AND workout_date BETWEEN ? AND ?`,
+            [req.user.email, startOfMonth, endOfMonth]
+        );
+        await connection.end();
+
+        const activeDays = result[0].active_days || 0;
+        res.status(200).json({ total: activeDays });
+    } catch (error) {
+        console.error('DB ERROR:', error);
+        res.status(500).json({ message: 'Error retrieving active days this month.' });
+    }
+});
+
 // Route: Get Suggested Workout based on user's fitness goal
 app.get('/api/suggested-workout', authenticateToken, async (req, res) => {
     try {

@@ -123,7 +123,25 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (error) {
             console.error('Error fetching active days this week:', error);
         }
-    }   
+    }
+
+    // Fetch active days this month
+    async function activeDaysThisMonth() {
+        const token = localStorage.getItem("jwtToken");
+
+        try {
+            const res = await fetch('/api/active-days-this-month', {
+                headers: {
+                    "Authorization": token
+                }
+            });
+
+            const data = await res.json();
+            document.getElementById('activeDaysMonth').textContent = data.total;
+        } catch (error) {
+            console.error('Error fetching active days this month:', error);
+        }
+    }
 
         // Fetch calories consumed today
     async function caloriesConsumedToday() {
@@ -260,6 +278,7 @@ async function getTargetCalories() {
     totalMealCount();
     caloriesBurnedToday();
     activeDaysThisWeek();
+    activeDaysThisMonth();
     updateGoalProgress();
     // Fetch the user's name and display a welcome message based on username and span id welcomeMessage
     
