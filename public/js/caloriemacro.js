@@ -68,6 +68,19 @@ function getMealActionColor(action) {
     return action === "favorite" ? "#1f9d55" : "#d64545";
 }
 
+function formatDisplayText(value) {
+    if (!value) {
+        return "";
+    }
+
+    return String(value)
+        .replace(/_/g, " ")
+        .split(" ")
+        .filter(Boolean)
+        .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+        .join(" ");
+}
+
 async function renderMeals() {
     const token = localStorage.getItem("jwtToken");
     const tbody = document.querySelector("#mealTable tbody");
@@ -94,7 +107,7 @@ async function renderMeals() {
             row.dataset.mealId = meal.meal_id;
             row.innerHTML = `
                 <td>${formatDateForDisplay(meal.meal_date)}</td>
-                <td>${meal.meal_type}</td>
+                <td>${formatDisplayText(meal.meal_type)}</td>
                 <td>${meal.description}</td>
                 <td>${meal.calories}</td>
                 <td>${meal.protein}</td>
@@ -150,7 +163,7 @@ async function renderFavoriteMeals() {
         data.favorites.forEach((meal) => {
             const row = document.createElement("tr");
             row.innerHTML = `
-                <td>${meal.meal_type}</td>
+                <td>${formatDisplayText(meal.meal_type)}</td>
                 <td>${meal.description}</td>
                 <td>${meal.calories}</td>
                 <td>${meal.protein}</td>
@@ -227,10 +240,9 @@ function clearFilters() {
     applyFilters();
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-    const token = localStorage.getItem("jwtToken");
+document.addEventListener("DOMContentLoaded", async () => {
+    const token = await requireAuthenticatedPage();
     if (!token) {
-        window.location.href = "/";
         return;
     }
 
@@ -364,9 +376,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 return;
             }
 
-            goalText = goalText.replace(/_/g, " ");
-
-            document.getElementById("currentGoal").textContent = goalText;
+            document.getElementById("currentGoal").textContent = formatDisplayText(goalText);
             document.getElementById("goalCard").style.display = "inline-flex";
         } catch (error) {
             console.error("Error fetching goal:", error);
@@ -628,78 +638,3 @@ mealList.forEach((_, index) => {
     refreshMealTables();
 });
 
-
-
-// CHART CARD CODE
-
-// testing visual rep of table
-function getMealData() {
-  const rows = document.querySelectorAll("#mealTable tbody tr");
-
-  let labels = [];
-  let data = [];
-
-  rows.forEach(row => {
-    const cells = row.querySelectorAll("td");
-    
-    labels.push(cells[0].innerText); // e.g., date
-    data.push(parseFloat(cells[7].innerText)); // e.g., meals/reps
-  });
-
-  return { labels, data };
-}
-let chart;
-
-function getMealData() {
-  const rows = document.querySelectorAll("#mealTable tbody tr");
-
-  let labels = [];
-  let data = [];
-
-  rows.forEach(row => {
-    const cells = row.querySelectorAll("td");
-
-    labels.push(cells[0].innerText); // Date
-    data.push(parseFloat(cells[3].innerText));
-  });
-
-  return { labels, data };
-}
-
-function renderChart(type) {
-  const canvas = document.getElementById("mealChart");
-  if (!canvas) return;
-
-  const ctx = canvas.getContext("2d");
-  const mealData = getMealData();
-
-  if (chart) chart.destroy();
-
-  chart = new Chart(ctx, {
-    type: type,
-    data: {
-      labels: mealData.labels,
-      datasets: [{
-        label: "Calories Consumed",
-        data: mealData.data,
-        borderWidth: 2
-      }]
-    },
-    options: {
-    responsive: true,
-    maintainAspectRatio: false
-    }
-  });
-    setTimeout(() => {
-    chart.resize();
-  }, 50);
-}
-
-window.switchChart = function(type) {
-  console.log("switching to:", type);
-  renderChart(type);
-};
-
-window.addEventListener("load", () => {
-  renderChart("bar");
-});

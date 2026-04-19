@@ -1,13 +1,13 @@
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     
-    const token = localStorage.getItem('jwtToken');
-        if (!token) {
-            window.location.href = '/';
-        } else {
-            DataModel.setToken(token);
-            displayWelcomeMessage();
-            displayOldAccountAlert();
-        }
+    const token = await requireAuthenticatedPage();
+    if (!token) {
+        return;
+    }
+
+    DataModel.setToken(token);
+    displayWelcomeMessage();
+    displayOldAccountAlert();
     
     //////////////////////////////////////////
     //ELEMENTS TO ATTACH EVENT LISTENERS
@@ -24,9 +24,15 @@ document.addEventListener('DOMContentLoaded', () => {
     //EVENT LISTENERS
     //////////////////////////////////////////
     // Log out and redirect to login
-    logoutButton.addEventListener('click', () => {
-        localStorage.removeItem('token');
-        window.location.href = '/';
+    logoutButton.addEventListener('click', async () => {
+        try {
+            await fetch('/api/logout', { method: 'POST' });
+        } catch (error) {
+            console.error('Error logging out:', error);
+        }
+
+        localStorage.removeItem('jwtToken');
+        window.location.replace('/');
     });
 
     async function displayWelcomeMessage() {

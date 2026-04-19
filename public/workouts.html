@@ -5,23 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Workout Input and Tracker</title>
     <link rel="stylesheet" href="css/workout.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <div class="header-bar">
         <button class="button" onclick="goHome()">Back</button>
+        <img src="./logos/GymRat.png" class="header-logo" alt="GymRat Logo">
         <div></div>
     </div>
 
     <script>
     function goHome() {window.location.href = '/basepage';}
     </script>
-
-    <div id="suggestionCard" class="suggestionCard">
-    <strong>Suggested Workouts</strong>
-<div id="suggestionContent" style="margin-top: 12px; display: flex; flex-direction: column; gap: 8px;"></div>    <button id="logSuggestionButton" style="margin-top: 12px; width: 100%;" class="button">Log Selected Workout</button>
-    <p id="suggestionResult" style="font-size: 12px; margin-top: 6px; color: green;"></p>
-</div>
 
     <h1 id="workoutHeader" class="user-message">Workout Input and History</h1>
 
@@ -30,10 +24,32 @@
     <span id="currentGoal"></span>
 </div>
 
+<div id="suggestionCard" class="suggestionCard collapsible-card">
+    <div class="collapsible-card-header suggestion-card-title-row">
+        <strong>Suggested Workouts</strong>
+        <button type="button" class="collapse-toggle" aria-expanded="true">
+            <span class="collapse-toggle-icon" aria-hidden="true">−</span>
+            <span class="collapse-toggle-text">Minimize</span>
+        </button>
+    </div>
+    <div class="collapsible-card-content">
+        <div id="suggestionContent" style="margin-top: 8px; display: flex; flex-direction: row; gap: 12px;"></div>
+        <button id="logSuggestionButton" style="margin-top: 10px;" class="button">Log Selected Workout</button>
+        <p id="suggestionResult" style="font-size: 12px; margin-top: 6px; color: green;"></p>
+    </div>
+</div>
+
 
 <!-- workout inputs -->
-    <div class="container">
-    <h3>New Workout Input</h3>
+    <div class="container collapsible-card">
+    <div class="collapsible-card-header card-title-row">
+        <h3>New Workout Input</h3>
+        <button type="button" class="collapse-toggle" aria-expanded="true">
+            <span class="collapse-toggle-icon" aria-hidden="true">−</span>
+            <span class="collapse-toggle-text">Minimize</span>
+        </button>
+    </div>
+    <div class="collapsible-card-content form-card-content">
 
     <div class="form-group quarter">
     <label for="workoutName">Workout Name:</label>
@@ -86,21 +102,29 @@
 </div>
 
 <div class="form-group favorite-toggle">
-    <label for="favoriteWorkout">Favorite Workout:</label>
+    <label>Favorite Workout:</label>
     <div class="checkbox-row">
-        <input type="checkbox" id="favoriteWorkout" name="favoriteWorkout">
+        <input type="checkbox" id="favoriteWorkout" name="favoriteWorkout" aria-label="Save this workout to favorites">
         <span>Save this workout to favorites</span>
     </div>
 </div>
     
     <button id="submit" class="inputsubmit-button">Submit</button>
 
+    </div>
 </div>
 
 <!-- favorite workouts table -->
-    <div class="card">
-        <h3>Favorite Workouts</h3>
+    <div class="card collapsible-card">
+        <div class="collapsible-card-header card-title-row">
+            <h3>Favorite Workouts</h3>
+            <button type="button" class="collapse-toggle" aria-expanded="true">
+                <span class="collapse-toggle-icon" aria-hidden="true">−</span>
+                <span class="collapse-toggle-text">Minimize</span>
+            </button>
+        </div>
 
+        <div class="collapsible-card-content">
         <table id="favoriteWorkoutTable">
             <thead>
                 <tr>
@@ -116,27 +140,20 @@
             </thead>
             <tbody></tbody>
         </table>
+        </div>
     </div>
 
-
-     <!-- CHART CARD -->
-<div class="chart-card">
-    <div class="chart-controls">
-            <button class="chart-button" onclick="switchChart('bar')">Bar</button>
-            <button class="chart-button" onclick="switchChart('line')">Line</button>
-        </div>
-    <div class="chart-area">
-        <canvas id="workoutChart"></canvas>
-     </div>
-</div>
-
-
-<br><br>
-
     <!-- Filter for Table -->
-    <div class="filter-container">
+    <div class="filter-container collapsible-card">
 
-    <h3>Filter for Table</h3>
+    <div class="collapsible-card-header card-title-row">
+        <h3>Filter for Table</h3>
+        <button type="button" class="collapse-toggle" aria-expanded="true">
+            <span class="collapse-toggle-icon" aria-hidden="true">−</span>
+            <span class="collapse-toggle-text">Minimize</span>
+        </button>
+    </div>
+    <div class="collapsible-card-content filter-card-content">
 
     <div class="form-group">
     <label for="dateFrom">From:</label>
@@ -211,13 +228,24 @@
     <button id="refreshButton" class="tablebutton">Refresh Table</button>
     </div>
 
+    </div>
 </div>
 
 
 <!-- Actual Table for Past Workouts -->
-    <div class="card">
-        <h3>Past Workouts</h3>
+    <div class="card collapsible-card">
+        <div class="collapsible-card-header card-title-row">
+            <div class="card-title-actions">
+                <h3>Past Workouts</h3>
+                <a href="analytics.html" class="tablebutton analytics-link-button">Go to Analytics</a>
+            </div>
+            <button type="button" class="collapse-toggle" aria-expanded="true">
+                <span class="collapse-toggle-icon" aria-hidden="true">−</span>
+                <span class="collapse-toggle-text">Minimize</span>
+            </button>
+        </div>
 
+        <div class="collapsible-card-content">
         <table id="workoutTable">
             <thead>
                 <tr>
@@ -234,6 +262,7 @@
             </thead>
             <tbody></tbody>
         </table>
+        </div>
     </div>
 
     <div id="deleteWorkoutModal" class="confirm-modal hidden">
@@ -254,6 +283,8 @@
 
 
     <script src="/js/datamodel.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/collapsibleCards.js"></script>
     <script src="/js/workouts.js"></script>
 
 </body>

@@ -68,6 +68,26 @@ function getWorkoutActionColor(action) {
     return action === "favorite" ? "#1f9d55" : "#d64545";
 }
 
+function formatDisplayText(value) {
+    if (!value) {
+        return "";
+    }
+
+    return String(value)
+        .replace(/_/g, " ")
+        .split(" ")
+        .filter(Boolean)
+        .map((word) => {
+            const upperWord = word.toUpperCase();
+            if (upperWord === "HIIT") {
+                return "HIIT";
+            }
+
+            return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+        })
+        .join(" ");
+}
+
 async function renderWorkouts() {
     const token = localStorage.getItem("jwtToken");
     const tbody = document.querySelector("#workoutTable tbody");
@@ -95,8 +115,8 @@ async function renderWorkouts() {
             row.innerHTML = `
                 <td>${formatWorkoutDateForDisplay(workout.workout_date)}</td>
                 <td>${workout.workout_name}</td>
-                <td>${workout.workout_type}</td>
-                <td>${workout.intensity_level}</td>
+                <td>${formatDisplayText(workout.workout_type)}</td>
+                <td>${formatDisplayText(workout.intensity_level)}</td>
                 <td>${workout.duration_minutes}</td>
                 <td>${workout.calories_burned}</td>
                 <td>${workout.notes ?? ""}</td>
@@ -151,8 +171,8 @@ async function renderFavoriteWorkouts() {
             const row = document.createElement("tr");
             row.innerHTML = `
                 <td>${workout.workout_name}</td>
-                <td>${workout.workout_type}</td>
-                <td>${workout.intensity_level}</td>
+                <td>${formatDisplayText(workout.workout_type)}</td>
+                <td>${formatDisplayText(workout.intensity_level)}</td>
                 <td>${workout.duration_minutes}</td>
                 <td>${workout.calories_burned}</td>
                 <td>${workout.notes ?? ""}</td>
@@ -219,10 +239,9 @@ function clearFilters() {
     applyFilters();
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-    const token = localStorage.getItem("jwtToken");
+document.addEventListener("DOMContentLoaded", async () => {
+    const token = await requireAuthenticatedPage();
     if (!token) {
-        window.location.href = "/";
         return;
     }
 
@@ -244,10 +263,62 @@ document.addEventListener("DOMContentLoaded", () => {
 
     workoutDateInput.value = getTodayWorkoutInputValue();
 
+    function getWorkoutData() {
+        const rows = document.querySelectorAll("#workoutTable tbody tr");
+
+        let labels = [];
+        let data = [];
+
+        rows.forEach(row => {
+            const cells = row.querySelectorAll("td");
+
+            labels.push(cells[0].innerText); // Date
+            data.push(parseFloat(cells[5].innerText)); // Calories
+        });
+
+        return { labels, data };
+    }
+    let chart;
+
+    function renderChart(type) {
+        const canvas = document.getElementById("workoutChart");
+        if (!canvas) return;
+
+        const ctx = canvas.getContext("2d");
+        const workoutData = getWorkoutData();
+
+        if (chart) chart.destroy();
+
+        chart = new Chart(ctx, {
+            type: type,
+            data: {
+            labels: workoutData.labels,
+            datasets: [{
+                label: "Calories Burned",
+                data: workoutData.data,
+                borderWidth: 2
+            }]
+        },
+            options: {
+            responsive: true,
+            maintainAspectRatio: false
+            }
+        });
+            setTimeout(() => {
+            chart.resize();
+        }, 50);
+    }
+
+    window.switchChart = function(type) {
+        console.log("switching to:", type);
+        renderChart(type);
+    };
+
     async function refreshWorkoutTables() {
         await renderWorkouts();
         await renderFavoriteWorkouts();
         applyFilters();
+        renderChart("bar")
     }
 
     function openDeleteWorkoutModal(workoutId, workoutLabel, action = "delete") {
@@ -356,9 +427,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 return;
             }
 
-            goalText = goalText.replace(/_/g, " ");
-
-            document.getElementById("currentGoal").textContent = goalText;
+            document.getElementById("currentGoal").textContent = formatDisplayText(goalText);
             document.getElementById("goalCard").style.display = "inline-flex";
         } catch (error) {
             console.error("Error fetching goal:", error);
@@ -380,12 +449,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const workoutList = Array.isArray(suggestions) ? suggestions : [suggestions];
 
     content.innerHTML = workoutList.map((workout, index) => `
-    <div style="display: flex; align-items: flex-start; gap: 6px; padding: 10px; border: 1px solid #c0c8f0; border-radius: 8px; background: #fff;">
+    <div style="flex: 1; display: flex; align-items: flex-start; gap: 6px; padding: 10px; border: 1px solid #c8e6c9; border-radius: 8px; background: #fff;">
         <input type="checkbox" id="workoutCheck_${index}" style="margin-top: 3px; flex-shrink: 0; width: 12px; height: 12px;">
         <label for="workoutCheck_${index}" style="cursor: pointer; font-size: 12px; line-height: 1.4;">
             <b>${workout.workout_name}</b><br>
-            Type: ${workout.workout_type}<br>
-            Intensity: ${workout.intensity_level}<br>
+            Type: ${formatDisplayText(workout.workout_type)}<br>
+            Intensity: ${formatDisplayText(workout.intensity_level)}<br>
             Duration: ${workout.duration_minutes} mins<br>
             Calories: ${workout.calories_burned}
         </label>
@@ -606,74 +675,3 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 
-// testing visual rep of table
-function getWorkoutData() {
-  const rows = document.querySelectorAll("#workoutTable tbody tr");
-
-  let labels = [];
-  let data = [];
-
-  rows.forEach(row => {
-    const cells = row.querySelectorAll("td");
-    
-    labels.push(cells[0].innerText); // e.g., date
-    data.push(parseFloat(cells[4].innerText)); // e.g., weight/reps
-  });
-
-  return { labels, data };
-}
-let chart;
-
-function getWorkoutData() {
-  const rows = document.querySelectorAll("#workoutTable tbody tr");
-
-  let labels = [];
-  let data = [];
-
-  rows.forEach(row => {
-    const cells = row.querySelectorAll("td");
-
-    labels.push(cells[0].innerText); // Date
-    data.push(parseFloat(cells[5].innerText)); // Calories
-  });
-
-  return { labels, data };
-}
-
-function renderChart(type) {
-  const canvas = document.getElementById("workoutChart");
-  if (!canvas) return;
-
-  const ctx = canvas.getContext("2d");
-  const workoutData = getWorkoutData();
-
-  if (chart) chart.destroy();
-
-  chart = new Chart(ctx, {
-    type: type,
-    data: {
-      labels: workoutData.labels,
-      datasets: [{
-        label: "Calories Burned",
-        data: workoutData.data,
-        borderWidth: 2
-      }]
-    },
-    options: {
-    responsive: true,
-    maintainAspectRatio: false
-    }
-  });
-    setTimeout(() => {
-    chart.resize();
-  }, 50);
-}
-
-window.switchChart = function(type) {
-  console.log("switching to:", type);
-  renderChart(type);
-};
-
-window.addEventListener("load", () => {
-  renderChart("bar");
-});

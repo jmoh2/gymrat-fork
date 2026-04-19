@@ -1,6 +1,7 @@
 :root {
     --primary-blue: #1e5a96;
     --secondary-blue: #2e7bb4;
+    --title-outline-blue: #1e5a96;
     --light-blue: #e8f4f8;
     --accent-green: #27a745;
     --light-green: #e8f5e9;
@@ -27,21 +28,26 @@ body {
     min-height: 100vh;
 }
 
-.logo {
-    display: block;
-    max-width: 120px;
-    height: auto;
-    margin: 40px auto 20px;
-}
-
 .header-bar {
+    position: relative;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 12px 40px;
+    min-height: 76px;
+    padding: 10px 40px;
     background: var(--white);
     box-shadow: var(--shadow-sm);
     border-bottom: 2px solid var(--light-blue);
+}
+
+.header-logo {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 66px;
+    height: 66px;
+    object-fit: contain;
+    transform: translate(-50%, -50%);
 }
 
 .logout-btn {
@@ -81,48 +87,214 @@ body {
 .welcome-message {
     background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
     color: var(--white);
-    padding: 32px;
-    border-radius: 12px;
+    padding: 18px 30px;
+    border-radius: 0 0 16px 16px;
     box-shadow: var(--shadow-lg);
-    width: 90%;
-    max-width: 700px;
-    margin: 30px auto 0;
+    width: min(100%, 1180px);
+    margin: 0 auto;
     text-align: center;
 }
 
 .welcome-message h1 {
-    font-size: 28px;
-    margin-bottom: 8px;
+    font-size: 24px;
+    margin-bottom: 4px;
     font-weight: 700;
 }
 
 .welcome-message p {
-    font-size: 16px;
+    font-size: 14px;
     opacity: 0.95;
     font-weight: 400;
 }
 
 .container {
+    position: relative;
     background: var(--white);
     padding: 32px;
     border-radius: 12px;
     box-shadow: var(--shadow-md);
+    overflow: hidden;
     width: 90%;
     max-width: 900px;
     margin: 30px auto;
 }
 
-.container h2 {
+.container::before, .progress-graph::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 6px;
+    background: var(--primary-blue);
+    border-radius: 12px 0 0 12px;
+    z-index: 2;
+    pointer-events: none;
+}
+
+.container h2, .progress-graph h1 {
+    display: inline-flex;
+    align-items: center;
+    width: fit-content;
+    position: relative;
     color: var(--primary-blue);
-    margin-bottom: 24px;
-    font-size: 24px;
+    background:
+        linear-gradient(90deg, #ffffff 0%, #f7fbfc 72%, #e8f5e9 100%) padding-box,
+        linear-gradient(90deg, var(--title-outline-blue), var(--accent-green)) border-box;
+    border: 4px solid transparent;
+    border-radius: 0 999px 999px 0;
+    padding: 17px 82px 17px 41px;
+    margin: 6px 0 30px -39px;
+    font-size: 26px;
     font-weight: 700;
+    line-height: 1.15;
+    white-space: nowrap;
+    letter-spacing: 0.2px;
+    z-index: 1;
 }
 
 .header {
     display: flex;
     flex-direction: column;
     gap: 16px;
+}
+
+.dashboard-links {
+    width: 90%;
+    max-width: 1120px;
+    margin: 38px auto 84px;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 22px;
+}
+
+.nav-card {
+    position: relative;
+    display: flex;
+    min-height: 190px;
+    padding: 28px;
+    overflow: hidden;
+    isolation: isolate;
+    color: var(--primary-blue);
+    text-decoration: none;
+    border: 1px solid rgba(30, 90, 150, 0.16);
+    border-radius: 18px;
+    background:
+        radial-gradient(circle at 92% 18%, rgba(39, 167, 69, 0.16), transparent 34%),
+        linear-gradient(135deg, #ffffff 0%, #f4fbfc 58%, #edf9ef 100%);
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.nav-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    border-left: 6px solid #cfdcde;
+    pointer-events: none;
+    transition: border-color 0.25s ease;
+}
+
+.nav-card::after {
+    content: "Open";
+    position: absolute;
+    right: 18px;
+    bottom: 16px;
+    color: var(--accent-green);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    opacity: 0;
+    transform: translateX(-6px);
+    transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.nav-card:hover {
+    transform: translateY(-5px);
+    border-color: rgba(22, 143, 59, 0.48);
+    box-shadow: 0 18px 34px rgba(30, 90, 150, 0.18), 0 10px 18px rgba(22, 143, 59, 0.12);
+}
+
+.nav-card:hover::before {
+    border-left-color: #168f3b;
+}
+
+.nav-card:hover::after {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.nav-card-text {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    gap: 9px;
+    max-width: 78%;
+}
+
+.nav-card-title {
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: 0.2px;
+}
+
+.nav-card-description {
+    color: var(--text-light);
+    font-size: 14px;
+    line-height: 1.45;
+}
+
+.nav-card-icon {
+    position: absolute;
+    right: -14px;
+    top: -18px;
+    width: 128px;
+    height: 128px;
+    color: var(--primary-blue);
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.75;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    opacity: 0.12;
+    transform: rotate(-8deg);
+    transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.nav-card:hover .nav-card-icon {
+    opacity: 0.17;
+    transform: rotate(-4deg) scale(1.04);
+}
+
+.nav-card-icon-meals {
+    right: -4px;
+    top: -12px;
+    width: 108px;
+    height: 108px;
+}
+
+.nav-card:hover .nav-card-icon-meals {
+    transform: rotate(-4deg) scale(1.02);
+}
+
+.nav-card-icon-analytics {
+    right: -6px;
+    top: -8px;
+    width: 118px;
+    height: 118px;
+}
+
+.nav-card:hover .nav-card-icon-analytics {
+    transform: rotate(-4deg) scale(1.03);
+}
+
+@media (max-width: 1050px) {
+    .dashboard-links {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
 }
 
 .button {
@@ -147,6 +319,16 @@ body {
 
 .button:active {
     transform: translateY(0);
+}
+
+@media (max-width: 620px) {
+    .dashboard-links {
+        grid-template-columns: 1fr;
+    }
+
+    .nav-card {
+        min-height: 148px;
+    }
 }
 
 .dashboard {
@@ -185,20 +367,15 @@ body {
 }
 
 .progress-graph {
+    position: relative;
     background: var(--white);
     padding: 32px;
     border-radius: 12px;
     box-shadow: var(--shadow-md);
+    overflow: hidden;
     width: 90%;
     max-width: 900px;
     margin: 0 auto 40px;
-    border-left: 4px solid var(--primary-blue);
-}
-
-.progress-graph h1 {
-    color: var(--primary-blue);
-    font-size: 20px;
-    font-weight: 700;
 }
 
 img {
