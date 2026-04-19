@@ -15,6 +15,62 @@ function normalizeAnalyticsDateValue(dateValue) {
     return parsedDate.toISOString().split("T")[0];
 }
 
+function getTimeBucket(dateValue, mode) {
+    const normalized = normalizeAnalyticsDateValue(dateValue);
+    if (!normalized) return "";
+
+    const date = new Date(`${normalized}T00:00:00`);
+    if (Number.isNaN(date.getTime())) return "";
+
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+
+    if (mode === "day") {
+        return normalized;
+    }
+
+    if (mode === "week") {
+        const temp = new Date(date);
+        const dayOfWeek = temp.getDay(); // 0 = Sunday
+        const diff = temp.getDate() - dayOfWeek;
+        temp.setDate(diff);
+
+        const weekStartYear = temp.getFullYear();
+        const weekStartMonth = String(temp.getMonth() + 1).padStart(2, "0");
+        const weekStartDay = String(temp.getDate()).padStart(2, "0");
+
+        return `${weekStartYear}-${weekStartMonth}-${weekStartDay}`;
+    }
+
+    if (mode === "month") {
+        return `${year}-${month}`;
+    }
+
+    if (mode === "year") {
+        return String(year);
+    }
+
+    return normalized;
+}
+
+function buildAggregatedChartData(records, dateKey, valueKey, mode) {
+    const totals = new Map();
+
+    records.forEach((record) => {
+        const bucket = getTimeBucket(record[dateKey], mode);
+        if (!bucket) return;
+
+        const value = Number(record[valueKey]) || 0;
+        totals.set(bucket, (totals.get(bucket) || 0) + value);
+    });
+
+    const labels = Array.from(totals.keys()).sort();
+    const data = labels.map((label) => totals.get(label));
+
+    return { labels, data };
+}
+
 function formatAnalyticsDateForDisplay(dateValue) {
     const normalizedDate = normalizeAnalyticsDateValue(dateValue);
 
@@ -133,9 +189,11 @@ function renderAnalyticsChart(canvasId, chartState, chartType, chartData, datase
 }
 
 function setActiveChartButton(target, chartType) {
-    document.querySelectorAll(`[data-chart-target="${target}"]`).forEach((button) => {
-        button.classList.toggle("active-chart-button", button.dataset.chartType === chartType);
-    });
+    document
+        .querySelectorAll(`button[data-chart-target="${target}"][data-chart-type]`)
+        .forEach((button) => {
+            button.classList.toggle("active-chart-button", button.dataset.chartType === chartType);
+        });
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
@@ -146,8 +204,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     const charts = {
-        workouts: { chart: null, type: "bar", data: { labels: [], data: [] } },
-        meals: { chart: null, type: "bar", data: { labels: [], data: [] } }
+        workouts: { chart: null, type: "bar", aggregate: "day", raw: [], data: { labels: [], data: [] } },
+        meals: { chart: null, type: "bar", aggregate: "day", raw: [], data: { labels: [], data: [] } }
     };
 
     try {
@@ -156,8 +214,11 @@ document.addEventListener("DOMContentLoaded", async () => {
             fetchAnalyticsRows("/api/meals", token, "meals")
         ]);
 
-        charts.workouts.data = buildWorkoutChartData(workouts);
-        charts.meals.data = buildMealChartData(meals);
+        charts.workouts.raw = workouts;
+        charts.meals.raw = meals;
+
+        charts.workouts.data = buildAggregatedChartData(workouts, "workout_date", "calories_burned", charts.workouts.aggregate);
+        charts.meals.data = buildAggregatedChartData(meals, "meal_date", "calories", charts.meals.aggregate);
 
         if (charts.workouts.data.data.length === 0) {
             document.getElementById("workoutAnalyticsStatus").textContent = "No workout data logged yet.";
@@ -188,14 +249,12 @@ document.addEventListener("DOMContentLoaded", async () => {
         document.getElementById("mealAnalyticsStatus").textContent = "Unable to load meal analytics.";
     }
 
-    document.querySelectorAll("[data-chart-target]").forEach((button) => {
+    document.querySelectorAll("button[data-chart-target][data-chart-type]").forEach((button) => {
         button.addEventListener("click", () => {
             const target = button.dataset.chartTarget;
             const chartType = button.dataset.chartType;
 
-            if (!charts[target]) {
-                return;
-            }
+            if (!charts[target]) return;
 
             charts[target].type = chartType;
             setActiveChartButton(target, chartType);
@@ -204,6 +263,39 @@ document.addEventListener("DOMContentLoaded", async () => {
                 target === "workouts" ? "workoutAnalyticsChart" : "mealAnalyticsChart",
                 charts[target],
                 chartType,
+                charts[target].data,
+                target === "workouts" ? "Calories Burned" : "Calories Consumed"
+            );
+        });
+    });
+
+    document.querySelectorAll(".time-filter").forEach((select) => {
+        select.addEventListener("change", () => {
+            const target = select.dataset.chartTarget;
+            const mode = select.value;
+
+            charts[target].aggregate = mode;
+
+            if (target === "workouts") {
+                charts[target].data = buildAggregatedChartData(
+                    charts[target].raw,
+                    "workout_date",
+                    "calories_burned",
+                    mode
+                );
+            } else {
+                charts[target].data = buildAggregatedChartData(
+                    charts[target].raw,
+                    "meal_date",
+                    "calories",
+                    mode
+                );
+            }
+
+            renderAnalyticsChart(
+                target === "workouts" ? "workoutAnalyticsChart" : "mealAnalyticsChart",
+                charts[target],
+                charts[target].type,
                 charts[target].data,
                 target === "workouts" ? "Calories Burned" : "Calories Consumed"
             );
