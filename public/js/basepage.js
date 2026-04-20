@@ -349,79 +349,129 @@ async function getTargetCalories() {
     }
 
 
-    // Make sure user doesn't select more than 6 checkboxes at once in the dashboard settings
-    const checkboxes = document.querySelectorAll('.dashboard-item');
-    
-    checkboxes.forEach(box => {
-        box.addEventListener('change', () => {
-            const checked = document.querySelectorAll('.dashboard-item:checked');
+    const maxDashboardCards = 6;
+    const defaultDashboardSelection = [
+        "card-workouts",
+        "card-calories-burned",
+        "card-total-meals",
+        "card-active-days-week",
+        "card-active-days-month",
+        "card-avg-protein"
+    ];
+    const dashboardPicker = document.querySelector(".dashboard-card-picker");
+    const dashboardPickerToggle = document.getElementById("dashboardPickerToggle");
+    const dashboardCardOptions = document.getElementById("dashboardCardOptions");
+    const optionInputs = document.querySelectorAll(".dashboard-card-option-input");
+    const selectionCount = document.getElementById("dashboardSelectionCount");
+    const clearDashboardCardsButton = document.getElementById("clearDashboardCardsBtn");
 
-        if (checked.length > 6) {
-            box.checked = false; // undo the click
-            alert("You can only select up to 6 cards.");
+    function getCheckedDashboardOptions() {
+        return Array.from(optionInputs).filter((input) => input.checked);
+    }
+
+    function updateSelectionCount() {
+        const checkedCount = getCheckedDashboardOptions().length;
+        if (selectionCount) {
+            selectionCount.textContent = `${checkedCount} of ${maxDashboardCards} selected`;
         }
-        });
-    });
+    }
 
-    // Update dashboard display based on selected checkboxes when "Update Dashboard" button is clicked
-    const updateBtn = document.getElementById('updateDashboardBtn');
-
-    if (updateBtn) {
-        updateBtn.addEventListener('click', () => {
-            const allCards = document.querySelectorAll('[id^="card-"]');
-            const checkedBoxes = document.querySelectorAll('.dashboard-item:checked');
-
-            const selected = [];
-            checkedBoxes.forEach(box => {
-                selected.push(box.value);
-            });
-            localStorage.setItem('dashboardSelection', JSON.stringify(selected));
-
-
-            allCards.forEach(card => {
-                card.style.display = 'none';
-            });
-
-            checkedBoxes.forEach(box => {
-                const cardId = box.value;
-                const card = document.getElementById(cardId);
-
-                if (card) {
-                    card.style.display = 'block';
-                }
-            });
+    function updateOptionVisualStates() {
+        optionInputs.forEach((input) => {
+            input.closest(".dashboard-card-option")?.classList.toggle("is-selected", input.checked);
         });
     }
 
-    // Initial dashboard setup based on saved preferences
-    function loadSavedDashboard() {
-        const saved = JSON.parse(localStorage.getItem('dashboardSelection'));
+    function setDashboardPickerOpen(isOpen) {
+        if (!dashboardPicker || !dashboardPickerToggle || !dashboardCardOptions) {
+            return;
+        }
 
-        if (!saved) return;
+        dashboardPicker.classList.toggle("is-open", isOpen);
+        dashboardPickerToggle.setAttribute("aria-expanded", String(isOpen));
+        dashboardCardOptions.setAttribute("aria-hidden", String(!isOpen));
 
-        const allCards = document.querySelectorAll('[id^="card-"]');
-        const checkboxes = document.querySelectorAll('.dashboard-item');
+    }
 
-        checkboxes.forEach(box => {
-            box.checked = false;
+    if (dashboardPickerToggle) {
+        dashboardPickerToggle.addEventListener("click", () => {
+            const isOpen = dashboardPicker?.classList.contains("is-open") || false;
+            setDashboardPickerOpen(!isOpen);
         });
+    }
+
+    optionInputs.forEach((input) => {
+        input.addEventListener("change", () => {
+            const checked = getCheckedDashboardOptions();
+
+            if (checked.length > maxDashboardCards) {
+                input.checked = false;
+                alert("You can only select up to 6 cards.");
+            }
+
+            updateSelectionCount();
+            updateOptionVisualStates();
+            saveAndApplyDashboardSelection();
+        });
+    });
+
+    if (clearDashboardCardsButton) {
+        clearDashboardCardsButton.addEventListener("click", () => {
+            optionInputs.forEach((input) => {
+                input.checked = false;
+            });
+
+            updateSelectionCount();
+            updateOptionVisualStates();
+            saveAndApplyDashboardSelection();
+        });
+    }
+
+    function applyDashboardSelection(selected) {
+        const allCards = document.querySelectorAll('.dashboard [id^="card-"]');
 
         allCards.forEach(card => {
             card.style.display = 'none';
         });
 
-        saved.forEach(value => {
-            const checkbox = document.querySelector(`.dashboard-item[value="${value}"]`);
-            const card = document.getElementById(value);
-
-            if (checkbox) {
-                checkbox.checked = true;
-            }
+        selected.forEach(cardId => {
+            const card = document.getElementById(cardId);
 
             if (card) {
                 card.style.display = 'block';
             }
         });
+    }
+
+    function saveAndApplyDashboardSelection() {
+        const selected = getCheckedDashboardOptions().map((input) => input.value);
+        localStorage.setItem('dashboardSelection', JSON.stringify(selected));
+        applyDashboardSelection(selected);
+    }
+
+    // Initial dashboard setup based on saved preferences
+    function loadSavedDashboard() {
+        let saved = null;
+
+        try {
+            saved = JSON.parse(localStorage.getItem('dashboardSelection'));
+        } catch (error) {
+            console.error('Error loading saved dashboard selection:', error);
+        }
+
+        const validOptionValues = Array.from(optionInputs).map((input) => input.value);
+        const savedSelection = Array.isArray(saved) ? saved : defaultDashboardSelection;
+        const selected = savedSelection
+            .filter((value) => validOptionValues.includes(value))
+            .slice(0, maxDashboardCards);
+
+        optionInputs.forEach(input => {
+            input.checked = selected.includes(input.value);
+        });
+
+        applyDashboardSelection(selected);
+        updateSelectionCount();
+        updateOptionVisualStates();
     }
 
     loadSavedDashboard();

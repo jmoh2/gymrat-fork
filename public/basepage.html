@@ -80,37 +80,61 @@
         </a>
     </nav>
 
-    <h2>Select Cards to add:</h2>
-    
-    <label>
-    <input type="checkbox" class="dashboard-item" value="card-workouts"> Total Workouts
-    </label>
-    <label>
-        <input type="checkbox" class="dashboard-item" value="card-calories-burned"> Calories Burned Today
-    </label>
-    <label>
-        <input type="checkbox" class="dashboard-item" value="card-total-meals"> Total Meals
-    </label>
-    <label>
-        <input type="checkbox" class="dashboard-item" value="card-active-days-week"> Active Days This Week
-    </label>
-    <label>
-        <input type="checkbox" class="dashboard-item" value="card-active-days-month"> Active Days This Month
-    </label>
-    <br>
-    <label>
-        <input type="checkbox" class="dashboard-item" value="card-avg-protein"> Average Protein per Meal
-    </label>
-    <label>
-        <input type="checkbox" class="dashboard-item" value="card-avg-fats"> Average Fats per Meal
-    </label>
-    <label>
-        <input type="checkbox" class="dashboard-item" value="card-avg-carbs"> Average Carbs per Meal
-    </label>
-    <label>
-        <input type="checkbox" class="dashboard-item" value="card-avg-calories"> Average Calories per Meal
-    </label>
-    <button id="updateDashboardBtn" class="button">Update Dashboard</button>
+    <section class="dashboard-card-picker" aria-labelledby="dashboardCardPickerTitle">
+        <h2 id="dashboardCardPickerTitle" class="visually-hidden">Dashboard Cards</h2>
+        <button id="dashboardPickerToggle" class="dashboard-picker-toggle" type="button" aria-expanded="false" aria-controls="dashboardCardOptions" aria-label="Add or change dashboard cards">
+            <span class="dashboard-picker-plus" aria-hidden="true">+</span>
+        </button>
+
+        <div id="dashboardCardOptions" class="dashboard-card-options-panel" aria-hidden="true">
+            <div class="dashboard-card-options-inner">
+                <p class="dashboard-picker-panel-title">Choose up to 6 dashboard cards</p>
+                <div class="dashboard-card-options">
+                    <label class="dashboard-card-option">
+                        <input type="checkbox" class="dashboard-card-option-input" value="card-workouts">
+                        <span>Total Workouts</span>
+                    </label>
+                    <label class="dashboard-card-option">
+                        <input type="checkbox" class="dashboard-card-option-input" value="card-calories-burned">
+                        <span>Calories Burned Today</span>
+                    </label>
+                    <label class="dashboard-card-option">
+                        <input type="checkbox" class="dashboard-card-option-input" value="card-total-meals">
+                        <span>Total Meals</span>
+                    </label>
+                    <label class="dashboard-card-option">
+                        <input type="checkbox" class="dashboard-card-option-input" value="card-active-days-week">
+                        <span>Active Days This Week</span>
+                    </label>
+                    <label class="dashboard-card-option">
+                        <input type="checkbox" class="dashboard-card-option-input" value="card-active-days-month">
+                        <span>Active Days This Month</span>
+                    </label>
+                    <label class="dashboard-card-option">
+                        <input type="checkbox" class="dashboard-card-option-input" value="card-avg-protein">
+                        <span>Average Protein per Meal</span>
+                    </label>
+                    <label class="dashboard-card-option">
+                        <input type="checkbox" class="dashboard-card-option-input" value="card-avg-fats">
+                        <span>Average Fats per Meal</span>
+                    </label>
+                    <label class="dashboard-card-option">
+                        <input type="checkbox" class="dashboard-card-option-input" value="card-avg-carbs">
+                        <span>Average Carbs per Meal</span>
+                    </label>
+                    <label class="dashboard-card-option">
+                        <input type="checkbox" class="dashboard-card-option-input" value="card-avg-calories">
+                        <span>Average Calories per Meal</span>
+                    </label>
+                </div>
+
+                <div class="dashboard-picker-actions">
+                    <span id="dashboardSelectionCount">0 of 6 selected</span>
+                    <button id="clearDashboardCardsBtn" class="dashboard-clear-button" type="button">Clear All</button>
+                </div>
+            </div>
+        </div>
+    </section>
     
 
    <div class="dashboard">
